@@ -1,0 +1,178 @@
+%%
+%% This is file 'bxwareki.sty'.
+%%
+%% Copyright (c) 2018 Takayuki YATO (aka. "ZR")
+%%   GitHub:   https://github.com/zr-tex8r
+%%   Twitter:  @zr_tex8r
+%%
+%% This package is distributed under the MIT License.
+%%
+
+%% package declaration
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bxwareki}[2018/04/08 v0.2]
+
+%% preparation
+\def\xx@pkgname{bxwareki}
+\providecommand\bxDebug[1]{}
+
+%--------------------------------------- general
+
+%% \xx@engine
+\def\xx@next#1#2{%
+  \edef\xx@tmpa{\string#1}\edef\xx@tmpb{\meaning#1}%
+  \ifx\xx@tmpa\xx@tmpb #2\fi}
+\chardef\xx@engine=0 %8-bit
+\xx@next\kanjiskip{\chardef\xx@engine=1 }%pTeX
+\xx@next\jintercharskip{\chardef\xx@engine=2 }%JTeX
+\xx@next\XeTeXversion{\chardef\xx@engine=3 }%Unicode
+\xx@next\luatexversion{\chardef\xx@engine=3 }%Unicode
+
+%% \xx@oncex{...} : once-expander
+\@onlypreamble\xx@oncex
+\ifx\unexpanded\@undefined
+  \def\xx@oncex#1{#1}
+\else
+  \def\xx@oncex#1{\unexpanded\expandafter{#1}}
+\fi
+
+%--------------------------------------- Japanese words
+
+%% \xx@S : inter-kanji-ascii skip
+\let\xx@S\@empty
+%% \xx@C : something for JTeX
+\let\xx@C\relax
+
+%% \xx@add@jchar\CS{<combo-code>}
+\@onlypreamble\xx@add@jchar
+\def\xx@add@jchar#1#2{%
+  \begingroup
+    \def\xx@next##1{\xdef#1{\xx@oncex#1\xx@oncex{##1}}}%
+    \edef\xx@tmpa{#2}%
+    \expandafter\xx@add@jchar@dec\xx@tmpa::::\@nil
+  \endgroup}
+\@onlypreamble\xx@add@jchar@dec
+\@onlypreamble\xx@add@jchar@dec@a
+\@onlypreamble\xx@add@jchar@dec@b
+\ifcase\xx@engine %8-bit
+  \def\xx@add@jchar@dec#1:#2:#3:#4:#5\@nil{%
+    \xx@add@jchar@dec@a#1000000\@nil}
+  \def\xx@add@jchar@dec@a#1#2#3#4#5#6#7\@nil{%
+    \let\do\xx@add@jchar@dec@b
+    \do{#1#2}\do{#3#4}\do{#5#6}}
+  \def\xx@add@jchar@dec@b#1{%
+    \lccode`\~="#1\relax\lowercase{\xx@next{\noexpand~}}}
+  \let\xx@org@tie=~ \let~=\relax %freeze
+  \def\xx@S{~}
+  \AtEndOfPackage{%
+    \let~=\xx@org@tie \let\xx@org@tie\@undefined}
+\or %pTeX
+  \def\xx@add@jchar@dec#1:#2:#3:#4:#5\@nil{%
+    \kansujichar\@ne=\jis"#3\relax \xx@next{\kansuji\@ne}}
+\or %JTeX
+  \def\xx@add@jchar@dec#1:#2:#3:#4:#5\@nil{%
+    \xx@next{\xx@C#4}}
+  \let\xx@S\relax %freeze
+  \AtEndOfPackage{%
+    \def\xx@C#1#2#3{\mbox{\csname j#1\endcsname\char"#2#3}}%
+    \def\xx@S{\hskip
+      \ifdim\jasciikanjiskip=\z@ \fontdimen7\ja\@minus\fontdimen9\ja
+      \else \jasciikanjiskip \fi \relax}}
+\or %Unicode
+  \def\xx@add@jchar@dec#1:#2:#3:#4:#5\@nil{%
+    \lccode`\Z="#2\relax \lowercase{\xx@next{\noexpand Z}}}
+\fi
+
+%% \xx@@showa : kanji string 'Showa'
+\let\xx@@showa\@empty
+\xx@add@jchar\xx@@showa{E698AD:662D:3E3C:f3F}
+\xx@add@jchar\xx@@showa{E5928C:548C:4F42:l83}
+%% \xx@@heisei : kanji string 'Heisei'
+\let\xx@@heisei\@empty
+\xx@add@jchar\xx@@heisei{E5B9B3:5E73:4A3F:jAA}
+\xx@add@jchar\xx@@heisei{E68890:6210:402E:fED}
+%% \xx@@nen : kanji for 'year'
+\let\xx@@nen\@empty
+\xx@add@jchar\xx@@nen{E5B9B4:5E74:472F:i80}
+%% \xx@@gatsu : kanji for 'month'
+\let\xx@@gatsu\@empty
+\xx@add@jchar\xx@@gatsu{E69C88:6708:376E:cDF}
+%% \xx@@nichi : kanji for 'day'
+\let\xx@@nichi\@empty
+\xx@add@jchar\xx@@nichi{E697A5:65E5:467C:i6F}
+%% \xx@@gan : kanji for 'origin'
+\let\xx@@gan\@empty
+\xx@add@jchar\xx@@gan{E58583:5143:3835:d04}
+
+%--------------------------------------- load the new gengo
+
+%% \xx@new@gengo@file
+% The external data file for the new gengo.
+\def\xx@new@gengo@file{bxwareki2019.def}
+
+%% \xx@new@gengo
+% The kanji string for the new gengo if available; otherwise empty.
+\let\xx@new@gengo\@empty
+
+%% read the file
+\endlinechar\m@ne
+\openin\@inputcheck=\xx@new@gengo@file\relax
+\ifeof\@inputcheck\else
+  \read\@inputcheck to\xx@tmpa
+  \ifeof\@inputcheck\else
+    \edef\xx@next{\noexpand\xx@new@gengo{\xx@tmpa}}
+    \expandafter\xx@add@jchar\xx@next
+    \read\@inputcheck to\xx@tmpa
+    \ifeof\@inputcheck
+      \global\let\xx@new@gengo\@empty
+    \else
+      \edef\xx@next{\noexpand\xx@new@gengo{\xx@tmpa}}
+      \expandafter\xx@add@jchar\xx@next
+    \fi
+  \fi
+\fi
+\endlinechar=13 %
+
+%--------------------------------------- wareki year
+
+%%<+> \WarekiYear : number of wareki year
+\@ifdefinable\WarekiYear{%
+  \newcount\WarekiYear}
+%%<+> \WarekiGengo : kanji string of the current gengo
+\newcommand*\WarekiGengo{}
+
+%% get the value
+\@tempcnta=\the\year\two@digits\month\two@digits\day\relax
+\WarekiYear\year
+\ifnum\@tempcnta<19700101 % ancient times
+\else\ifnum\@tempcnta<19890108 % showa era
+  \let\WarekiGengo\xx@@showa
+  \advance\WarekiYear-1925\relax
+\else\ifnum\@tempcnta<20190501 % heisei era
+  \let\WarekiGengo\xx@@heisei
+  \advance\WarekiYear-1988\relax
+\else % the new era
+  \ifx\xx@new@gengo\@empty\else
+    \let\WarekiGengo\xx@new@gengo
+    \advance\WarekiYear-2018\relax
+  \fi
+\fi\fi\fi
+
+%%<*> \warekitoday
+\@ifdefinable\warekitoday{%
+  \edef\warekitoday{%
+    \ifx\WarekiGengo\@empty
+      \the\year \xx@S
+    \else
+      \xx@oncex{\WarekiGengo}%
+      \ifnum\WarekiYear=\@ne \xx@oncex{\xx@@gan}%
+      \else \xx@S \the\WarekiYear \xx@S
+      \fi
+    \fi
+    \xx@oncex{\xx@@nen}%
+    \xx@S \the\month \xx@S \xx@oncex{\xx@@gatsu}%
+    \xx@S \the\day \xx@S \xx@oncex{\xx@@nichi}}}
+
+%--------------------------------------- all done
+\endinput
+%% EOF
