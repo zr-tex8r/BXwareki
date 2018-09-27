@@ -12,7 +12,7 @@
 
 %% file declaration
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{bxwareki-cd.def}[2018/09/24 v0.3]
+\ProvidesFile{bxwareki-cd.def}[2018/10/01 v0.4]
 
 \ifbxwy@epTeXinputencoding@ok
   \epTeXinputencoding utf8
@@ -121,6 +121,42 @@
 \def\bxwy@cdpo@@o#1#2#3{#1#2o}
 \def\bxwy@cdpo@@O#1#2#3{#1#2O}
 
+%--------------------------------------- special procedure for LuaTeX
+\ifx\bxwy@new@gengo\@empty \ifnum\bxwy@engine=5
+
+% The process below tries to guess the name of the new gengo
+% from the result of os,date().
+\begingroup
+  \catcode`\~=12 \let\0\relax \let\1\relax \let\2\relax
+  \directlua{
+    if not bxwareki then bxwareki = {} end
+    local os = bxwareki.os or os
+    function bxwareki.get_new_gengo()
+      local lc_time = nil
+      local ok, ret = pcall(function()
+        assert(os.type == "unix")
+        lc_time = os.setlocale(nil, "time")
+        assert(os.setlocale("ja_JP.utf8", "time") or
+          os.setlocale("ja_JP.UTF-8", "time"))
+        local heisei = "\229\185\179\230\136\144"
+        local kanji = "[\228-\233][\128-\191][\128-\191]"
+        local gh = os.date("\037EC", 1500000000)
+        local gn = os.date("\037EC", 1600000000)
+        assert(gh == heisei and gn ~= heisei and
+          gn:match("^"..kanji..kanji.."$"))
+        return gn
+      end)
+      os.setlocale(lc_time, "time")
+      return ok and ret or ""
+    end}
+  \toks@{}
+  \directlua{pcall(function()
+    tex.toks[0] = bxwareki.get_new_gengo()
+  end)}
+  \xdef\bxwy@new@gengo{\the\toks@}
+\endgroup
+
+\fi\fi
 %--------------------------------------- all done
 \endinput
 %% EOF
