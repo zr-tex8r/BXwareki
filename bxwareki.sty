@@ -87,6 +87,38 @@
     \expandafter\mathchardef\csname c@#1\endcsname#2\relax}
 \fi
 
+%--------------------------------------- options
+
+%% variables
+\newif\ifbxwy@download
+
+%% 'download'
+\DeclareOption{download2019}{%
+  \bxwy@downloadtrue}
+% dispatch
+\ProcessOptions\relax
+
+%--------------------------------------- download mode
+
+\ifbxwy@download
+  \chardef\bxwy@next=\tw@
+  \ifnum\bxwy@engine=5
+    \input{bxwareki-cd.def}
+  \fi
+  \ifcase\bxwy@next
+    \PackageInfo\bxwy@pkgname
+     {The installation of 'bxwareki2019.def' succeeded\@gobble}
+  \or
+    \PackageWarningNoLine\bxwy@pkgname
+     {The installation of 'bxwareki2019.def' failed}
+  \else
+    \PackageWarningNoLine\bxwy@pkgname
+     {Download mode is not available here and thus\MessageBreak
+      the option 'download2019' is ignored}
+  \fi
+\fi
+\bxwy@downloadfalse
+
 %--------------------------------------- Japanese string maker
 
 % The "combo-code" represents a single Japanese character and has
