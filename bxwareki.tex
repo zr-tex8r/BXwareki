@@ -1,0 +1,286 @@
+% LuaLaTeX document; UTF-8
+\documentclass[a4paper]{article}
+\usepackage[scale=0.75]{geometry}
+\usepackage{shortvrb}
+\MakeShortVerb{\|}
+\newcommand{\PkgVersion}{0.4}
+\newcommand{\PkgDate}{2018/10/01}
+\newcommand{\Pkg}[1]{\textsf{#1}}
+\newcommand{\Meta}[1]{$\langle$\textit{#1}$\rangle$}
+\newcommand{\Note}{\par\noindent\emph{Note:}\quad}
+\newcommand{\Ie}{i.\,e.}
+\newcommand{\Eg}{e.\,g.}
+\newcommand{\Means}{~:\quad}
+\usepackage{bxtexlogo}
+\bxtexlogoimport{*,ApTeX,JTeX}
+% Japanese something
+\usepackage{fontspec}
+\newfontfamily{\fIpaex}{IPAexMincho}[Scale=0.95]
+\newcommand*{\Ja}[1]{{\fIpaex#1}}
+\newcommand*{\+}{\hspace{0.25em minus 0.25em}}
+%-----------------------------------------------------------
+\begin{document}
+\title{The \Pkg{bxwareki} package}
+\author{Takayuki YATO\quad (aka.~``ZR'')}
+\date{v\PkgVersion \quad[\PkgDate]}
+\maketitle
+
+%===========================================================
+\section{Overview}
+\label{sec:Overview}
+
+This package provides commands to convert from the Gregorian calendar
+(2018/8/28) to the Japanese rendering of the Japanese calendar
+(\Ja{平成\+30\+年\+8\+月\+28\+日}).
+You can choose whether the numbers are written
+in Western numerals (28) or kanji numerals (\Ja{二八}).
+
+Note that the package only deals with dates in the year 1873 or later,
+where the Japanese calendar is really a Gregorian calendar
+with the different notation of years.
+
+\paragraph{System requirement}
+
+\begin{itemize}
+\item \TeX{} format: \LaTeX.
+\item \TeX{} engine: {\pdfTeX}, {\LuaTeX}, {\XeTeX},
+  {\pTeX}, {\upTeX}, {\ApTeX} ({\pTeX}-ng), NTT-{\JTeX}.
+\end{itemize}
+
+\Note The modern (post-1873) Japanese calendar (\emph{wareki}; \Ja{和暦})
+can be regarded as a variant of Gregorian calendar
+where only the notation of years differs from the original.
+To avoid confusion, this document refers to the original Gregorian
+calendar as the \emph{Western calendar},
+which corresponds to the Japanese term \emph{seireki} (\Ja{西暦}).
+
+%===========================================================
+\section{Package Loading}
+\label{sec:Loading}
+
+No options are needed in normal use%
+\footnote{See Section~\ref{ssec:download2019}
+  for the \texttt{download2019} option.}.
+
+\begin{quote}\small\begin{verbatim}
+\usepackage{bxwareki}
+\end{verbatim}\end{quote}
+
+%===========================================================
+\section{Usage}
+\label{sec:Usage}
+
+%-------------------
+\subsection{Conversion from the given date}
+
+\begin{itemize}
+\item |\warekisetdate{|\Meta{year}|}{|\Meta{month}|}{|\Meta{day}|}|\Means
+  Converts from the specified Western date.
+  The result will be rendered by the commands described
+  at the following items, where the result for the invocation
+  |\warekisetdate{2018}{8}{28}|
+  will be shown as example.
+
+  \Note Although the Japanese calendar differs from the Western calendar
+  only in the notation of years,
+  the value of months and days are still required,
+  since the notation of the year in which
+  \emph{kaigen} (\Ja{改元}; change of gengo)
+  occurs depends on months and days.
+
+\item |\warekisettoday|\Means
+  Does |\warekisetdate| with the current date.
+
+\item Counter |warekiyear|\Means
+  The year number (within the gengo); \Eg~``\Ja{30}''.
+
+  \Note Unlike ordinary counters,
+  the assignment to |warekiyear| by |\warekisetdate| is \emph{local}.
+  Moreover, manual assignment to this counter is not supported.
+
+\item |\warekigengo|\Means
+  The gengo in kanji, \Eg~``\Ja{平成}''.
+
+\item |\warekigengoinitial|\Means
+  The initial Latin letter of the gengo, \Eg~``\Ja{H}''.
+
+\item |\warekiyear|\Means
+  The full notation of the year (without `\Ja{年}'),
+  \Eg~``\Ja{平成\+30}''.
+
+  \Note When the year number is one,
+  the kanji `\Ja{元}' is used instead of the numeral `\Ja{1}'.
+
+\item |\warekidate|\Means
+  The date string, \Eg~``\Ja{平成\+30\+年\+8\+月\+28\+日}''.
+
+\item |\warekikanjidate|\Means
+  The date string using kansuji (kanji numerals),
+  \Eg~``\Ja{平成三〇年八月二八日}''.
+
+\item |\warekijkanjidate|\Means
+  The date string using ``kansuji-by-reading''
+  (that is, kanji rendering of numbers in the Japanese language),
+  \Eg.``\Ja{平成三十年八月二十八日}''.
+
+\item |\warekicustomdate{|\Meta{option}|}|\Means
+  The date string in the form specified with the option.
+  The option is a string of letters such as |wk|
+  and each letter means a specific setting.
+  When the option is empty, the date is rendered in the form
+  ``\Ja{2018\+年\+8\+月\+28\+日}'' (using the Western calendar).
+  The available option letters are:
+  \begin{itemize}
+  \item |w|\Means
+    uses Japanese calendar (\Ja{2018\+年} $\to$ \Ja{平成\+30\+年});
+  \item |k|\Means
+    uses kansuji (\Ja{28} $\to$ \Ja{二八});
+  \item |j|\Means
+    uses kansuji-by-reading (\Ja{28} $\to$ \Ja{二十八});
+    \par\smallskip
+    \Note Western years does not support kansuji-by-reading
+    and thus |k| will be applied instead
+    (\Ja{二〇一八}, not \Ja{二千十八}).
+  \item |J|\Means
+    variant of |j| where ``ten's multiple'' kanji characters
+    (\Ja{廿} and \Ja{卅}) are employed (\Ja{28} $\to$ \Ja{廿八});
+  \item |o|\Means
+    uses \emph{imyo} (\Ja{異名}) for months%
+    \footnote{Don't ask me if this form is ever used in LaTeX document!}
+    (\Ja{8\+月} $\to$ \Ja{葉月}).
+  \end{itemize}
+
+  \Note This command is supported only on {\pdfLaTeX}, {\XeLaTeX},
+  {\LuaLaTeX}, {\upLaTeX}, {Ap\LaTeX} and recent versions of {\pLaTeX}.
+  On other engines it simply falls back to |\warekidate|.
+
+\item |\WarekiIfCustomDateAvailable{|\Meta{true}|}{|\Meta{false}|}|\Means
+  Tests if the command |\warekicustomdate| is
+  supported on the engine in use.
+\end{itemize}
+
+%-------------------
+\subsection{Current date}
+
+These commands always represent the current date,
+and are not affected by |\warekisetdate| (or |\warekisettoday|).
+
+\begin{itemize}
+\item |\warekitoday|\Means
+  The |\warekidate| form of the current date.
+\item |\warekikanjitoday|\Means
+  The |\warekikanjidate| form.
+\item |\warekijkanjitoday|\Means
+  The |\warekijkanjidate| form.
+\end{itemize}
+
+%-------------------
+\subsection{Inter-alphabet-kanji glues}
+
+In quality Japanese typesetting, a thin space
+(\emph{shibuaki}; \Ja{四分空き}) must be inserted
+between an alphabet letter and a kanji letter.
+This package by default inserts a command
+suitable for the most prevalent Japanese-typesetting environment
+for the engine in use.
+
+\begin{itemize}
+\item On {\pLaTeX}, {\upLaTeX} and {Ap\LaTeX}:
+  Nothing is inserted,
+  since the engine can automatically insert shibuaki spaces.
+\item On {\LuaLaTeX} and {\XeLaTeX}:
+  Nothing is inserted,
+  on the assumption that the package for Japanese typesetting
+  (such as \Pkg{\LuaTeX-ja} and \Pkg{xeCJK})
+  will automatically insert shibuaki spaces.
+\item On {\LaTeX} and {\pdfLaTeX}:
+  |~| is inserted,
+  on the assumption that the \Pkg{CJK} package is employed
+  and |\CJKtilde| is in effect.
+\end{itemize}
+
+On the engines with {\eTeX} extension,
+the command for shibuaki can be changed with the following commands:
+\begin{itemize}
+\item |\WarekiUseCustomInterGlue{|\Meta{text}|}|\Means
+  Uses \Meta{text} for making shibuaki spaces.
+\item |\WarekiUseNormalInterGlue|\Means
+  Reverts |\WarekiUseCustomInterGlue|
+  and uses the normal setting.
+\end{itemize}
+
+%===========================================================
+\section{Support for the kaigen planned in 2019}
+\label{sec:Kaigen}
+
+In Japan a kaigen (due to the abdication of the Emperor)
+is planned on 2019/05/01,
+but the new gengo is not yet announced.
+Thus in the current version of the package,
+the date of the day or later is not supported
+(the Western year will be printed instead).
+
+This package will be updated to support the new gengo
+and uploaded to CTAN,
+as soon as the new gengo is announced.
+
+%-------------------
+\subsection{The \texttt{download2019} option}
+\label{ssec:download2019}
+
+Instead of manually downloading the new version from CTAN,
+you can get the support for the new gengo
+with a single run of {\LaTeX}
+(of course after the annoucement of the gengo):
+when you compile a document which loads this package
+with |download2019| option using {\LuaLaTeX}
+with \emph{full shell escape} enabled%
+\footnote{In most system, full shell escape is enabled
+  by \texttt{-shell-escape} option.},
+then the run will download an additional file
+from the package's GitHub repository
+and install it into the user's TEXMF tree.
+
+In short: make the following dummy%
+\footnote{Using the dummy document with minimal content
+could reduce the risk of using full shell escape,
+but you need to trust me, of course.}
+document file (named |dummy.tex|)
+\begin{quote}\small\begin{verbatim}
+\documentclass{article}
+\usepackage[download2019]{bxwareki}
+\stop
+\end{verbatim}\end{quote}
+and run |lualatex -shell-escape dummy|.
+After that, the new gengo will be supported
+on any engine, without shell escape.
+
+%===========================================================
+\section{Notices for {\TeX} programmers}
+\label{sec:Allez}
+
+\begin{itemize}
+\item On the engines with native kanji/Unicode support
+  (\Ie~{\LuaLaTeX}, {\XeLaTeX}, {\pLaTeX}, {\upLaTeX}, and {Ap\LaTeX}),
+  the content (one-level expansion) of |\wareki...date|
+  (except |\warekicustomdate|) and |\wareki...today|
+  is a simple string of character tokens,
+  unless |\WarekiUseCustomInterGlue| is in effect.
+  The same holds for {\LaTeX} and {\pdfLaTeX},
+  except that each kanji character is
+  represented by the sequence of activated byte tokens
+  and |~| is inserted as shibuaki spaces.
+\item On the engines with native kanji/Unicode support,
+  |\warekicustomdate| fully expands to a simple string
+  of character tokens
+  (again without |\WarekiUseCustomInterGlue|),
+  and the situation on {\LaTeX} and {\pdfLaTeX}
+  is parallel to that described at the previous item.
+\item The use of |\WarekiUseCustomInterGlue|
+  does not break the full expandability
+  of |\wareki...date| and |\wareki...today|
+  on the engines with native kanji/Unicode support.
+\end{itemize}
+
+%===========================================================
+\end{document}
