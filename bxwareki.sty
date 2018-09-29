@@ -314,6 +314,10 @@
 % The kanji string for the new gengo if available; otherwise empty.
 \let\bxwy@new@gengo\@empty
 
+%% \bxwy@new@gengo@initial
+% The initial Latin letter for the new gengo.
+\let\bxwy@new@gengo@initial\@empty
+
 %% read the file
 \endlinechar\m@ne
 \openin\@inputcheck=\bxwy@new@gengo@file\relax
@@ -328,10 +332,19 @@
     \else
       \edef\bxwy@next{\noexpand\bxwy@new@gengo{\bxwy@tmpa}}
       \expandafter\bxwy@add@jchar\bxwy@next
+      \read\@inputcheck to\bxwy@tmpa
+      \ifeof\@inputcheck
+        \global\let\bxwy@new@gengo\@empty
+      \else
+        \let\bxwy@new@gengo@initial\bxwy@tmpa
+      \fi
     \fi
   \fi
 \fi
 \endlinechar=13 %
+\def\bxwy@next#1>#2#3#4\bxwy@end{%
+  \ifx#3\relax\else \let\bxwy@new@gengo@initial\@empty \fi}
+\expandafter\bxwy@next\meaning\bxwy@new@gengo@initial\relax\relax\bxwy@end
 
 %--------------------------------------- calculate wareki year
 
@@ -373,7 +386,7 @@
 % Sets \bxwy@g@gengo and \bxwy@g@year.
 \def\bxwy@calc@wareki@year{%
   \@tempcnta=\the\year\two@digits\month\two@digits\day\relax
-  \let\bxwy@tmpb\@empty \@tempcntb\year
+  \let\bxwy@tmpa\@empty \let\bxwy@tmpb\@empty \@tempcntb\year
   \ifnum\@tempcnta<18730101 % ancient times (non-Gregorian)
   \else\ifnum\@tempcnta<19120730 % meiji era
     \let\bxwy@tmpb\bxwy@@meiji
@@ -397,6 +410,16 @@
   \global\let\bxwy@g@gengo\bxwy@tmpb
   \xdef\bxwy@g@year{\the\@tempcntb}%
   \xdef\bxwy@g@date{{\the\year}{\the\month}{\the\day}}}
+
+%% \bxwy@gengo@initial@of\CS
+\def\bxwy@gengo@initial@of#1{%
+  \ifx#1\@empty \@empty
+  \else\ifx#1\bxwy@@meiji  M%
+  \else\ifx#1\bxwy@@taisho T%
+  \else\ifx#1\bxwy@@showa  S%
+  \else\ifx#1\bxwy@@heisei H%
+  \else\ifx#1\bxwy@new@gengo \bxwy@new@gengo@initial
+  \fi\fi\fi\fi\fi\fi}
 
 %--------------------------------------- render wareki date
 
@@ -456,7 +479,8 @@
 %% \bxwy@render@date
 \def\bxwy@render@date{%
   \bxwy@render@for\bxwy@date\warekigengo\c@warekiyear
-      \warekiyear\warekidate\warekikanjidate\warekijkanjidate}
+      \warekiyear\warekidate\warekikanjidate\warekijkanjidate
+  \edef\warekigengoinitial{\bxwy@gengo@initial@of\warekigengo}}
 %% \bxwy@render@today
 \def\bxwy@render@today{%
   \bxwy@render@for\bxwy@today@date\bxwy@today@gengo\bxwy@today@year
@@ -479,6 +503,8 @@
 \bxwy@newcounter{warekiyear}
 %%<*> \warekigengo : kanji string of the current gengo
 \newcommand*\warekigengo{}
+%%<*> \warekigengoinitial : initial Latin letter of the current gengo
+\newcommand*\warekigengoinitial{}
 %%<*> \warekiyear : string of the wareki year
 \newcommand*\warekiyear{}
 %%<*> \warekidate : string of the wareki date

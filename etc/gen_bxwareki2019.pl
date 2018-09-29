@@ -5,6 +5,7 @@ use utf8;
 use Encode qw(encode decode);
 
 my $gengo = '電書';
+my $gengo_initial = 'D';
 my $out_file = './bxwareki2019.def';
 
 sub one_char {
@@ -34,6 +35,7 @@ sub one_char {
   foreach (split(m//, $gengo)) {
     print $h (one_char($_), "\n");
   }
+  print $h ($gengo_initial, "\n");
   close($h);
 }
 
