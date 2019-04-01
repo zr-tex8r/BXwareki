@@ -4,8 +4,8 @@ use strict;
 use utf8;
 use Encode qw(encode decode);
 
-my $gengo = '電書';
-my $gengo_initial = 'D';
+my $gengo = '令和';
+my $gengo_initial = 'R';
 my $out_file = './bxwareki2019.def';
 
 sub one_char {

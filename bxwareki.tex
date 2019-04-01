@@ -3,8 +3,8 @@
 \usepackage[scale=0.75]{geometry}
 \usepackage{shortvrb}
 \MakeShortVerb{\|}
-\newcommand{\PkgVersion}{0.4}
-\newcommand{\PkgDate}{2018/10/01}
+\newcommand{\PkgVersion}{0.5}
+\newcommand{\PkgDate}{2019/04/01}
 \newcommand{\Pkg}[1]{\textsf{#1}}
 \newcommand{\Meta}[1]{$\langle$\textit{#1}$\rangle$}
 \newcommand{\Note}{\par\noindent\emph{Note:}\quad}
@@ -146,7 +146,7 @@ No options are needed in normal use%
     (\Ja{廿} and \Ja{卅}) are employed (\Ja{28} $\to$ \Ja{廿八});
   \item |o|\Means
     uses \emph{imyo} (\Ja{異名}) for months%
-    \footnote{Don't ask me if this form is ever used in LaTeX document!}
+    \footnote{Don't ask me if this form is ever used in {\LaTeX} document!}
     (\Ja{8\+月} $\to$ \Ja{葉月}).
   \end{itemize}
 
@@ -215,18 +215,19 @@ the command for shibuaki can be changed with the following commands:
 
 In Japan a kaigen (due to the abdication of the Emperor)
 is planned on 2019/05/01,
-but the new gengo is not yet announced.
-Thus in the current version of the package,
-the date of the day or later is not supported
-(the Western year will be printed instead).
-
-This package will be updated to support the new gengo
-and uploaded to CTAN,
-as soon as the new gengo is announced.
+and the new gengo ``\Ja{令和}'' has been announced in advance.
+(The announcement was made on 2019/04/01.)
+Thus this package has been updated to support the new gengo.
 
 %-------------------
 \subsection{The \texttt{download2019} option}
 \label{ssec:download2019}
+
+\begin{quote}\itshape
+This function is no longer necessary,
+since the new gengo is supported by default in the current version.
+The function will be removed in near future.
+\end{quote}
 
 Instead of manually downloading the new version from CTAN,
 you can get the support for the new gengo

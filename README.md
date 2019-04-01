@@ -36,6 +36,8 @@ See the manual `bxwareki.pdf` for detail.
 Revision History
 ----------------
 
+  * Version 0.5  ‹2019/04/01›
+      - Support for the new gengo “令和”.
   * Version 0.4  ‹2018/10/01›
       - Add `\warekigengoinitial`.
       - Add option `download2019`.
@@ -46,4 +48,4 @@ Revision History
 
 --------------------
 Takayuki YATO (aka. "ZR")  
-http://zrbabbler.sp.land.to/
+https://github.com/zr-tex8r
