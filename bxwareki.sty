@@ -12,7 +12,7 @@
 
 %% package declaration
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{bxwareki}[2019/04/01 v0.5]
+\ProvidesPackage{bxwareki}[2019/06/01 v0.6]
 
 %% preparation
 \def\bxwy@pkgname{bxwareki}
@@ -89,35 +89,10 @@
 
 %--------------------------------------- options
 
-%% variables
-\newif\ifbxwy@download
-
 %% 'download'
-\DeclareOption{download2019}{%
-  \bxwy@downloadtrue}
+\DeclareOption{download2019}{}% now no-op
 % dispatch
 \ProcessOptions\relax
-
-%--------------------------------------- download mode
-
-\ifbxwy@download
-  \chardef\bxwy@next=\tw@
-  \ifnum\bxwy@engine=5
-    \input{bxwareki-cd.def}
-  \fi
-  \ifcase\bxwy@next
-    \PackageInfo\bxwy@pkgname
-     {The installation of 'bxwareki2019.def' succeeded\@gobble}
-  \or
-    \PackageWarningNoLine\bxwy@pkgname
-     {The installation of 'bxwareki2019.def' failed}
-  \else
-    \PackageWarningNoLine\bxwy@pkgname
-     {Download mode is not available here and thus\MessageBreak
-      the option 'download2019' is ignored}
-  \fi
-\fi
-\bxwy@downloadfalse
 
 %--------------------------------------- Japanese string maker
 
@@ -226,6 +201,10 @@
 \let\bxwy@@heisei\@empty
 \bxwy@add@jchar\bxwy@@heisei{E5B9B3:5E73:4A3F:jAA}
 \bxwy@add@jchar\bxwy@@heisei{E68890:6210:402E:fED}
+%% \bxwy@@reiwa : kanji string 'Reiwa'
+\let\bxwy@@reiwa\@empty
+\bxwy@add@jchar\bxwy@@reiwa{E4BBA4:4EE4:4E61:l44}
+\bxwy@add@jchar\bxwy@@reiwa{E5928C:548C:4F42:l83}
 %% \bxwy@@nen : kanji for 'year'
 \let\bxwy@@nen\@empty
 \bxwy@add@jchar\bxwy@@nen{E5B9B4:5E74:472F:i80}
@@ -304,48 +283,6 @@
   \ifnum#2>\z@  \bxwy@twicex{\csname bxwy@jcd/X\endcsname}\fi
   \ifnum#3>\z@  \bxwy@twicex{\csname bxwy@jcd/#3\endcsname}\fi}
 
-%--------------------------------------- load the new gengo
-
-%% \bxwy@new@gengo@file
-% The external data file for the new gengo.
-\def\bxwy@new@gengo@file{bxwareki2019.def}
-
-%% \bxwy@new@gengo
-% The kanji string for the new gengo if available; otherwise empty.
-\let\bxwy@new@gengo\@empty
-
-%% \bxwy@new@gengo@initial
-% The initial Latin letter for the new gengo.
-\let\bxwy@new@gengo@initial\@empty
-
-%% read the file
-\endlinechar\m@ne
-\openin\@inputcheck=\bxwy@new@gengo@file\relax
-\ifeof\@inputcheck\else % if available
-  \read\@inputcheck to\bxwy@tmpa
-  \ifeof\@inputcheck\else
-    \edef\bxwy@next{\noexpand\bxwy@new@gengo{\bxwy@tmpa}}
-    \expandafter\bxwy@add@jchar\bxwy@next
-    \read\@inputcheck to\bxwy@tmpa
-    \ifeof\@inputcheck
-      \global\let\bxwy@new@gengo\@empty
-    \else
-      \edef\bxwy@next{\noexpand\bxwy@new@gengo{\bxwy@tmpa}}
-      \expandafter\bxwy@add@jchar\bxwy@next
-      \read\@inputcheck to\bxwy@tmpa
-      \ifeof\@inputcheck
-        \global\let\bxwy@new@gengo\@empty
-      \else
-        \let\bxwy@new@gengo@initial\bxwy@tmpa
-      \fi
-    \fi
-  \fi
-\fi
-\endlinechar=13 %
-\def\bxwy@next#1>#2#3#4\bxwy@end{%
-  \ifx#3\relax\else \let\bxwy@new@gengo@initial\@empty \fi}
-\expandafter\bxwy@next\meaning\bxwy@new@gengo@initial\relax\relax\bxwy@end
-
 %--------------------------------------- calculate wareki year
 
 %% errors
@@ -401,10 +338,8 @@
     \let\bxwy@tmpb\bxwy@@heisei
     \advance\@tempcntb-1988\relax
   \else % the new era
-    \ifx\bxwy@new@gengo\@empty\else
-      \let\bxwy@tmpb\bxwy@new@gengo
-      \advance\@tempcntb-2018\relax
-    \fi
+    \let\bxwy@tmpb\bxwy@@reiwa
+    \advance\@tempcntb-2018\relax
   \fi\fi\fi\fi\fi
   %
   \global\let\bxwy@g@gengo\bxwy@tmpb
@@ -418,7 +353,7 @@
   \else\ifx#1\bxwy@@taisho T%
   \else\ifx#1\bxwy@@showa  S%
   \else\ifx#1\bxwy@@heisei H%
-  \else\ifx#1\bxwy@new@gengo \bxwy@new@gengo@initial
+  \else\ifx#1\bxwy@@reiwa  R%
   \fi\fi\fi\fi\fi\fi}
 
 %--------------------------------------- render wareki date

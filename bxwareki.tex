@@ -3,8 +3,8 @@
 \usepackage[scale=0.75]{geometry}
 \usepackage{shortvrb}
 \MakeShortVerb{\|}
-\newcommand{\PkgVersion}{0.5}
-\newcommand{\PkgDate}{2019/04/01}
+\newcommand{\PkgVersion}{0.6}
+\newcommand{\PkgDate}{2019/06/01}
 \newcommand{\Pkg}[1]{\textsf{#1}}
 \newcommand{\Meta}[1]{$\langle$\textit{#1}$\rangle$}
 \newcommand{\Note}{\par\noindent\emph{Note:}\quad}
@@ -34,6 +34,8 @@ This package provides commands to convert from the Gregorian calendar
 (\Ja{平成\+30\+年\+8\+月\+28\+日}).
 You can choose whether the numbers are written
 in Western numerals (28) or kanji numerals (\Ja{二八}).
+The package is aware of the current era name,
+\emph{Reiwa}~(\Ja{令和}).
 
 Note that the package only deals with dates in the year 1873 or later,
 where the Japanese calendar is really a Gregorian calendar
@@ -58,9 +60,7 @@ which corresponds to the Japanese term \emph{seireki} (\Ja{西暦}).
 \section{Package Loading}
 \label{sec:Loading}
 
-No options are needed in normal use%
-\footnote{See Section~\ref{ssec:download2019}
-  for the \texttt{download2019} option.}.
+No options are available.
 
 \begin{quote}\small\begin{verbatim}
 \usepackage{bxwareki}
@@ -208,53 +208,6 @@ the command for shibuaki can be changed with the following commands:
   Reverts |\WarekiUseCustomInterGlue|
   and uses the normal setting.
 \end{itemize}
-
-%===========================================================
-\section{Support for the kaigen planned in 2019}
-\label{sec:Kaigen}
-
-In Japan a kaigen (due to the abdication of the Emperor)
-is planned on 2019/05/01,
-and the new gengo ``\Ja{令和}'' has been announced in advance.
-(The announcement was made on 2019/04/01.)
-Thus this package has been updated to support the new gengo.
-
-%-------------------
-\subsection{The \texttt{download2019} option}
-\label{ssec:download2019}
-
-\begin{quote}\itshape
-This function is no longer necessary,
-since the new gengo is supported by default in the current version.
-The function will be removed in near future.
-\end{quote}
-
-Instead of manually downloading the new version from CTAN,
-you can get the support for the new gengo
-with a single run of {\LaTeX}
-(of course after the annoucement of the gengo):
-when you compile a document which loads this package
-with |download2019| option using {\LuaLaTeX}
-with \emph{full shell escape} enabled%
-\footnote{In most system, full shell escape is enabled
-  by \texttt{-shell-escape} option.},
-then the run will download an additional file
-from the package's GitHub repository
-and install it into the user's TEXMF tree.
-
-In short: make the following dummy%
-\footnote{Using the dummy document with minimal content
-could reduce the risk of using full shell escape,
-but you need to trust me, of course.}
-document file (named |dummy.tex|)
-\begin{quote}\small\begin{verbatim}
-\documentclass{article}
-\usepackage[download2019]{bxwareki}
-\stop
-\end{verbatim}\end{quote}
-and run |lualatex -shell-escape dummy|.
-After that, the new gengo will be supported
-on any engine, without shell escape.
 
 %===========================================================
 \section{Notices for {\TeX} programmers}

@@ -36,6 +36,8 @@ See the manual `bxwareki.pdf` for detail.
 Revision History
 ----------------
 
+  * Version 0.6  ‹2019/06/01›
+      - The file `bxwareki2019.def` is no longer required.
   * Version 0.5  ‹2019/04/01›
       - Support for the new gengo “令和”.
   * Version 0.4  ‹2018/10/01›
