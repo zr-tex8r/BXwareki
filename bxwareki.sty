@@ -294,7 +294,9 @@
 %% \bxwy@kansuji{<number>}
 % The kansuji representation of the number.
 \newcommand*\WarekiKansuji[1]{%
-  \expandafter\bxwy@kansuji\csname c@#1\endcsname}
+  \expandafter\@WarekiKansuji\csname c@#1\endcsname}
+\newcommand*\@WarekiKansuji{%
+  \bxwy@counter@fun\bxwy@kansuji}
 \def\bxwy@kansuji#1{%
   \ifnum#1<\z@\else
     \expandafter\bxwy@kansuji@a\number#1\bxwy@mk
@@ -305,9 +307,14 @@
     \expandafter\bxwy@kansuji@a
   \fi}
 
+%%<+> \WarekiJKansuji{<counter>}
 %% \bxwy@jkansuji{<number>}
 % The kansuji-by-reading representation of the number.
 % NB. Only valid in range 0..999; otherwise fallback to \bxwy@kansuji.
+\newcommand*\WarekiJKansuji[1]{%
+  \expandafter\@WarekiJKansuji\csname c@#1\endcsname}
+\newcommand*\@WarekiJKansuji{%
+  \bxwy@counter@fun\bxwy@jkansuji}
 \def\bxwy@jkansuji#1{%
   \expandafter\bxwy@jkansuji@a\number#1\bxwy@mk}
 \chardef\bxwy@jk@x=10
@@ -330,6 +337,18 @@
   \ifnum#2>\@ne \bxwy@twicex{\csname bxwy@jcd/#2\endcsname}\fi
   \ifnum#2>\z@  \bxwy@twicex{\csname bxwy@jcd/X\endcsname}\fi
   \ifnum#3>\z@  \bxwy@twicex{\csname bxwy@jcd/#3\endcsname}\fi}
+
+%% \bxwy@counter@fun
+\let\bxwy@tmpa=f
+\ifcase\bxwy@engine \or
+\or \let\bxwy@tmpa=t %jTeX
+\or \let\bxwy@tmpa=t %fallback
+\fi
+\ifx t\bxwy@tmpa
+  \def\bxwy@counter@fun#1#2{%
+    \expandafter\protect\expandafter#1\expandafter{\number#2}}
+\else \let\bxwy@counter@fun\@empty
+\fi
 
 %--------------------------------------- calculate wareki year
 
