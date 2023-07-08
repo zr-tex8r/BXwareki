@@ -34,11 +34,18 @@
 \chardef\bxwy@engine=0 % 8-bit TeX
 \bxwy@next\kanjiskip     {\chardef\bxwy@engine=1 }% pTeX (or upTeX)
 \bxwy@next\jintercharskip{\chardef\bxwy@engine=2 }% NTT-jTeX
-\bxwy@next\Omegaversion  {\chardef\bxwy@engine=3 }% Aleph
-\bxwy@next\XeTeXversion  {\chardef\bxwy@engine=4 }% XeTeX
-\bxwy@next\luatexversion {\chardef\bxwy@engine=5 }% LuaTeX
+\bxwy@next\Omegaversion  {\chardef\bxwy@engine=4 }% Omega
+\bxwy@next\XeTeXversion  {\chardef\bxwy@engine=5 }% XeTeX
+\bxwy@next\luatexversion {\chardef\bxwy@engine=6 }% LuaTeX
 \newif\ifbxwy@eTeX@ok
 \bxwy@next\eTeXversion{\bxwy@eTeX@oktrue}
+% if non-e-TeX and non-kanji-aware then fallback
+\ifbxwy@eTeX@ok\else \ifnum\bxwy@engine=0
+  \chardef\bxwy@engine=3 % fallback
+\fi\fi
+\ifx\WarekiForceFallback\@undefined\else
+  \chardef\bxwy@engine=3
+\fi
 \newif\ifbxwy@upTeX@ok
 \bxwy@next\forcecjktoken{\bxwy@upTeX@oktrue}
 \newif\ifbxwy@epTeXinputencoding@ok
@@ -53,6 +60,7 @@
   \else\ifbxwy@upTeX@ok \bxwy@customdate@oktrue
   \fi\fi
 \or % jTeX
+\or % fallback
 \else \bxwy@customdate@oktrue
 \fi
 
@@ -64,7 +72,7 @@
   \def\bxwy@oncex#1{\unexpanded\expandafter{#1}}
   \def\bxwy@twicex#1{\unexpanded\expandafter\expandafter\expandafter{#1}}
 \else
-  % Here it is assumed that the engine is (u)pTeX or JTeX.
+  % pTeX/JTeX/Omega/fallback
   \def\bxwy@oncex#1{#1}
   \def\bxwy@twicex#1{#1}
 \fi
@@ -88,6 +96,8 @@
 \fi
 
 %--------------------------------------- options
+% Note: This package will never have ordinary options.
+% If it has options, they will be used only in special workflow.
 
 %% 'download'
 \DeclareOption{download2019}{}% now no-op
@@ -111,6 +121,10 @@
 \let\bxwy@normal@S\relax
 %% \bxwy@C : Japanese character printer for JTeX
 \let\bxwy@C\relax
+%% \bxwy@U : Japanese character printer for fallback mode
+\let\bxwy@U\relax
+%% \bxwy@normal@U : the normal definition of \bxwy@U
+\def\bxwy@normal@U#1{?}
 
 %% \bxwy@freeze@fragile : make fragile cs unexpandable
 \let\bxwy@freeze@fragile\relax
@@ -162,7 +176,19 @@
     \let\bxwy@org@C\bxwy@C \let\bxwy@C\relax}
   \def\bxwy@restore@fragile{%
     \let\bxwy@@S\bxwy@org@@S \let\bxwy@C\bxwy@org@C}
-\else %Aleph/XeTeX/LuaTeX
+\or %fallback
+  \def\bxwy@add@jchar@dec#1:#2:#3:#4:#5\bxwy@end{%
+    \bxwy@next{\bxwy@U{#2}}}
+  \def\bxwy@C#1#2#3{%
+    \mbox{\csname j#1\endcsname\char"#2#3}}
+  \def\bxwy@S{~}
+  \let\bxwy@org@tie\relax
+  \def\bxwy@freeze@fragile{%
+    \let\bxwy@org@U\bxwy@U \let\bxwy@U\relax
+    \let\bxwy@org@tie=~\let~=\relax}
+  \def\bxwy@restore@fragile{%
+    \let~=\bxwy@org@tie \let\bxwy@U\bxwy@org@U}
+\else %Omega/XeTeX/LuaTeX
   \def\bxwy@add@jchar@dec#1:#2:#3:#4:#5\bxwy@end{%
     \lccode`\Z="#2\relax \lowercase{\bxwy@next{\noexpand Z}}}
 \fi
@@ -182,6 +208,20 @@
     \afterassignment\bxwy@render@all
     \protected\def\bxwy@S}}
 \fi                 %</eTeX>
+
+%--------------------------------------- Fallback handler
+
+%%<+> \WarekiResetUHandler
+% Sets \bxwy@U to \bxwy@normal@U.
+\newcommand*\WarekiResetUHandler{%
+  \let\bxwy@U\bxwy@normal@U}
+%%<+> \WarekiSetUHandler{<text>}
+% Redefines \bxwy@U. In <text> #1 means the codepoint in hex.
+\@ifdefinable\WarekiSetUHandler{%
+  \def\WarekiSetUHandler#{%
+    \def\bxwy@U##1}}
+% set default
+\WarekiResetUHandler
 
 %--------------------------------------- Japanese words
 
@@ -433,6 +473,17 @@
 \let\bxwy@today@gengo\relax
 \let\bxwy@today@year\relax
 \let\bxwy@today@yearstr\relax
+
+%%<*> \WarekiIfAvailable{<true>}{<false>}
+\ifnum\bxwy@engine=3
+  \newcommand*\WarekiIfAvailable{%
+    \ifx\bxwy@U\bxwy@normal@U \expandafter\@secondoftwo
+    \else \expandafter\@firstoftwo
+    \fi}
+\else
+  \newcommand*\WarekiIfAvailable{%
+    \@firstoftwo}
+\fi
 
 %%<*> counter 'warekiyear' : number of wareki year
 \bxwy@newcounter{warekiyear}
