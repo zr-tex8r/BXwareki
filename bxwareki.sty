@@ -192,22 +192,30 @@
   \def\bxwy@add@jchar@dec#1:#2:#3:#4:#5\bxwy@end{%
     \lccode`\Z="#2\relax \lowercase{\bxwy@next{\noexpand Z}}}
 \fi
-% set \bxwy@normal@S
-\let\bxwy@normal@S\bxwy@S
 
-\ifbxwy@eTeX@ok       %<*eTeX>
-%%<+> \WarekiUseNormalInterGlue
-% Uses the normal definition of inter-ascii-kanji skip.
+%--------------------------------------- Inter-ascii-kanji spaces
+
+%%<*> \WarekiUseNormalInterGlue
+% Uses the normal definition of inter-ascii-kanji space.
 \newcommand*\WarekiUseNormalInterGlue{%
   \let\bxwy@S\bxwy@normal@S
   \bxwy@render@all}
-%%<+> \WarekiUseCustomInterGlue{<text>}
-% Uses the custom definition of inter-ascii-kanji skip.
+%%<*> \WarekiUseNoInterGlue
+% Disables inter-ascii-kanji skip.
+\newcommand*\WarekiUseNoInterGlue{%
+  \let\bxwy@S\@empty
+  \bxwy@render@all}
+\ifbxwy@eTeX@ok       %<*eTeX>
+%%<*> \WarekiUseCustomInterGlue{<text>}
+% Uses the custom definition of inter-ascii-kanji space.
 \@ifdefinable\WarekiUseCustomInterGlue{%
   \def\WarekiUseCustomInterGlue#{%
     \afterassignment\bxwy@render@all
     \protected\def\bxwy@S}}
 \fi                 %</eTeX>
+
+% default is \WarekiUseNormalInterGlue
+\let\bxwy@normal@S\bxwy@S
 
 %--------------------------------------- Fallback handler
 
