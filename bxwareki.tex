@@ -3,8 +3,8 @@
 \usepackage[scale=0.75]{geometry}
 \usepackage{shortvrb}
 \MakeShortVerb{\|}
-\newcommand{\PkgVersion}{0.6}
-\newcommand{\PkgDate}{2019/06/01}
+\newcommand{\PkgVersion}{0.7}
+\newcommand{\PkgDate}{2023/07/07}
 \newcommand{\Pkg}[1]{\textsf{#1}}
 \newcommand{\Meta}[1]{$\langle$\textit{#1}$\rangle$}
 \newcommand{\Note}{\par\noindent\emph{Note:}\quad}
@@ -30,16 +30,20 @@
 \label{sec:Overview}
 
 This package provides commands to convert from the Gregorian calendar
-(2018/8/28) to the Japanese rendering of the Japanese calendar
-(\Ja{平成\+30\+年\+8\+月\+28\+日}).
+(2022/8/28) to the Japanese rendering of the Japanese calendar
+(\Ja{令和\+4\+年\+8\+月\+28\+日}).
 You can choose whether the numbers are written
-in Western numerals (28) or kanji numerals (\Ja{二八}).
-The package is aware of the current era name,
-\emph{Reiwa}~(\Ja{令和}).
+in Western numerals (like 28)
+or kanji numerals (\emph{kansuji}, like \Ja{二八}).
 
 Note that the package only deals with dates in the year 1873 or later,
-where the Japanese calendar is really a Gregorian calendar
+where the Japanese calendar (\emph{wareki}; \Ja{和暦})
+can be regarded as a variant of Gregorian calendar
 with the different notation of years.
+
+\Note To avoid confusion, this document refers to the original Gregorian
+calendar as the \emph{Western calendar},
+which corresponds to the Japanese term \emph{seireki} (\Ja{西暦}).
 
 \paragraph{System requirement}
 
@@ -49,12 +53,17 @@ with the different notation of years.
   {\pTeX}, {\upTeX}, {\ApTeX} ({\pTeX}-ng), NTT-{\JTeX}.
 \end{itemize}
 
-\Note The modern (post-1873) Japanese calendar (\emph{wareki}; \Ja{和暦})
-can be regarded as a variant of Gregorian calendar
-where only the notation of years differs from the original.
-To avoid confusion, this document refers to the original Gregorian
-calendar as the \emph{Western calendar},
-which corresponds to the Japanese term \emph{seireki} (\Ja{西暦}).
+This package is designed to be very generic,
+and it could work on engines other than those mentioned above.
+Starting from v0.7,
+when the package \emph{knows} that it cannot properly handle
+kanji characters on the engine in use,
+then it will switch to the ``fallback mode'',
+where all kanji characters are replaced with a `?' symbol.
+Users can use |\WarekiIfAvailable| to know
+whether the package really works.
+It is expected
+that this package never fails on load.
 
 %===========================================================
 \section{Package Loading}
@@ -76,9 +85,10 @@ No options are available.
 \begin{itemize}
 \item |\warekisetdate{|\Meta{year}|}{|\Meta{month}|}{|\Meta{day}|}|\Means
   Converts from the specified Western date.
-  The result will be rendered by the commands described
+  This command itself prints nothing
+  and the result will be rendered by the commands described
   at the following items, where the result for the invocation
-  |\warekisetdate{2018}{8}{28}|
+  |\warekisetdate{2022}{8}{28}|
   will be shown as example.
 
   \Note Although the Japanese calendar differs from the Western calendar
@@ -92,47 +102,47 @@ No options are available.
   Does |\warekisetdate| with the current date.
 
 \item Counter |warekiyear|\Means
-  The year number (within the gengo); \Eg~``\Ja{30}''.
+  The year number (within the gengo); \Eg~``\Ja{4}''.
 
   \Note Unlike ordinary counters,
   the assignment to |warekiyear| by |\warekisetdate| is \emph{local}.
   Moreover, manual assignment to this counter is not supported.
 
 \item |\warekigengo|\Means
-  The gengo in kanji, \Eg~``\Ja{平成}''.
+  The gengo (\Ja{元号}) in kanji, \Eg~``\Ja{令和}''.
 
 \item |\warekigengoinitial|\Means
-  The initial Latin letter of the gengo, \Eg~``\Ja{H}''.
+  The initial Latin letter of the gengo, \Eg~``\Ja{R}''.
 
 \item |\warekiyear|\Means
   The full notation of the year (without `\Ja{年}'),
-  \Eg~``\Ja{平成\+30}''.
+  \Eg~``\Ja{令和\+4}''.
 
   \Note When the year number is one,
   the kanji `\Ja{元}' is used instead of the numeral `\Ja{1}'.
 
 \item |\warekidate|\Means
-  The date string, \Eg~``\Ja{平成\+30\+年\+8\+月\+28\+日}''.
+  The date string, \Eg~``\Ja{令和\+4\+年\+8\+月\+28\+日}''.
 
 \item |\warekikanjidate|\Means
   The date string using kansuji (kanji numerals),
-  \Eg~``\Ja{平成三〇年八月二八日}''.
+  \Eg~``\Ja{令和四年八月二八日}''.
 
 \item |\warekijkanjidate|\Means
   The date string using ``kansuji-by-reading''
   (that is, kanji rendering of numbers in the Japanese language),
-  \Eg.``\Ja{平成三十年八月二十八日}''.
+  \Eg.``\Ja{令和四年八月二十八日}''.
 
 \item |\warekicustomdate{|\Meta{option}|}|\Means
   The date string in the form specified with the option.
   The option is a string of letters such as |wk|
   and each letter means a specific setting.
   When the option is empty, the date is rendered in the form
-  ``\Ja{2018\+年\+8\+月\+28\+日}'' (using the Western calendar).
+  ``\Ja{2022\+年\+8\+月\+28\+日}'' (using the Western calendar).
   The available option letters are:
   \begin{itemize}
   \item |w|\Means
-    uses Japanese calendar (\Ja{2018\+年} $\to$ \Ja{平成\+30\+年});
+    uses Japanese calendar (\Ja{2022\+年} $\to$ \Ja{令和\+4\+年});
   \item |k|\Means
     uses kansuji (\Ja{28} $\to$ \Ja{二八});
   \item |j|\Means
@@ -162,8 +172,9 @@ No options are available.
 %-------------------
 \subsection{Current date}
 
+There are also handy commands solely for printing the current date.
 These commands always represent the current date,
-and are not affected by |\warekisetdate| (or |\warekisettoday|).
+and are not affected by |\warekisetdate| or |\warekisettoday|.
 
 \begin{itemize}
 \item |\warekitoday|\Means
@@ -175,7 +186,7 @@ and are not affected by |\warekisetdate| (or |\warekisettoday|).
 \end{itemize}
 
 %-------------------
-\subsection{Inter-alphabet-kanji glues}
+\subsection{Inter-alphabet-kanji spaces}
 
 In quality Japanese typesetting, a thin space
 (\emph{shibuaki}; \Ja{四分空き}) must be inserted
@@ -194,24 +205,45 @@ for the engine in use.
   (such as \Pkg{\LuaTeX-ja} and \Pkg{xeCJK})
   will automatically insert shibuaki spaces.
 \item On {\LaTeX} and {\pdfLaTeX}:
-  |~| is inserted,
+  A tie (|~|) is inserted,
   on the assumption that the \Pkg{CJK} package is employed
   and |\CJKtilde| is in effect.
 \end{itemize}
 
-On the engines with {\eTeX} extension,
-the command for shibuaki can be changed with the following commands:
+The command for shibuaki can be changed with the following commands:
 \begin{itemize}
+\item |\WarekiUseNormalInterGlue|\Means
+  Uses the normal setting, as mentioned above.
+\item |\WarekiUseNoInterGlue|\Means
+  Disables shibuaki spaces.
 \item |\WarekiUseCustomInterGlue{|\Meta{text}|}|\Means
   Uses \Meta{text} for making shibuaki spaces.
-\item |\WarekiUseNormalInterGlue|\Means
-  Reverts |\WarekiUseCustomInterGlue|
-  and uses the normal setting.
+  \Note This command is supported
+  only on engines with {\eTeX} extension.
+\end{itemize}
+
+%-------------------
+\subsection{Counter output commands}
+
+The following commands are intended
+to use with |warekiyear| counter,
+but they can probably be used
+as general-use counter output commands
+(like |\arabic|):
+\begin{itemize}
+\item |\WarekiKansuji{|\Meta{counter}|}|\Means
+  Prints the counter value using kansuji.
+\item |\WarekiJKansuji{|\Meta{counter}|}|\Means
+  Prints the counter value using kansuji-by-reading.
+  Only valid for numbers less than 1000.
 \end{itemize}
 
 %===========================================================
 \section{Notices for {\TeX} programmers}
 \label{sec:Allez}
+
+%-------------------
+\subsection{Expandability of the commands}
 
 \begin{itemize}
 \item On the engines with native kanji/Unicode support
@@ -230,9 +262,11 @@ the command for shibuaki can be changed with the following commands:
   (again without |\WarekiUseCustomInterGlue|),
   and the situation on {\LaTeX} and {\pdfLaTeX}
   is parallel to that described at the previous item.
-\item The use of |\WarekiUseCustomInterGlue|
-  does not break the full expandability
-  of |\wareki...date| and |\wareki...today|
+\item When |\WarekiUseCustomInterGlue| is used with some argument,
+  the content of |\wareki...date| and |\wareki...today|
+  could contain some occurrences of the argument.
+  If the argument is fully expandable,
+  the commands are still fully expandable
   on the engines with native kanji/Unicode support.
 \end{itemize}
 

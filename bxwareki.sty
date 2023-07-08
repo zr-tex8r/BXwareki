@@ -1,7 +1,7 @@
 %%
 %% This is file 'bxwareki.sty'.
 %%
-%% Copyright (c) 2018,2019 Takayuki YATO (aka. "ZR")
+%% Copyright (c) 2018-2023 Takayuki YATO (aka. "ZR")
 %%   GitHub:   https://github.com/zr-tex8r
 %%   Twitter:  @zr_tex8r
 %%
@@ -12,7 +12,7 @@
 
 %% package declaration
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{bxwareki}[2019/06/01 v0.6]
+\ProvidesPackage{bxwareki}[2023/07/07 v0.7]
 
 %% preparation
 \def\bxwy@pkgname{bxwareki}
@@ -290,7 +290,7 @@
 \bxwy@set@jchar@digit{X}{E58D81:5341:3D3D:eE2}% ten
 \bxwy@set@jchar@digit{C}{E799BE:767E:4934:j41}% hundred
 
-%%<+> \WarekiKansuji{<counter>}
+%%<*> \WarekiKansuji{<counter>}
 %% \bxwy@kansuji{<number>}
 % The kansuji representation of the number.
 \newcommand*\WarekiKansuji[1]{%
@@ -307,7 +307,7 @@
     \expandafter\bxwy@kansuji@a
   \fi}
 
-%%<+> \WarekiJKansuji{<counter>}
+%%<*> \WarekiJKansuji{<counter>}
 %% \bxwy@jkansuji{<number>}
 % The kansuji-by-reading representation of the number.
 % NB. Only valid in range 0..999; otherwise fallback to \bxwy@kansuji.

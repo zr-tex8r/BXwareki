@@ -36,6 +36,10 @@ See the manual `bxwareki.pdf` for detail.
 Revision History
 ----------------
 
+  * Version 0.7  ‹2023/07/07›
+      - Support for the fallback mode.
+      - Add `\WarekiUseNoInterGlue`.
+      - Add `\WarekiKansuji` and `\WarekiJKansuji`.
   * Version 0.6  ‹2019/06/01›
       - The file `bxwareki2019.def` is no longer required.
   * Version 0.5  ‹2019/04/01›
