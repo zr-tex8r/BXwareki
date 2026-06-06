@@ -59,7 +59,31 @@
 
 %% preparation
 \def\bxwy@pkgname{bxwareki}
-\providecommand\bxDebug[1]{}
+\ifx t\bxUseDebug\else \long\def\bxDebug#1{}\fi
+
+%--------------------------------------- plain something
+
+\if t\bxwy@latex    %--------<*LaTeX>
+
+%% \bxwy@import\CSto\CSlatex
+\def\bxwy@import#1#2{\let#1=#2}
+%% \bxwy@import@ex\CSto\CSplain\CSlatex
+\def\bxwy@import@ex#1#2#3{\let#1=#3}
+
+\else               %--------<*!LaTeX>
+
+%% packages
+\input ltxcmds.sty
+\input infwarerr.sty
+
+\fi                 %--------</LaTeX>
+
+%% imports
+\bxwy@import\bxwy@command\relax
+\bxwy@import\bxwy@firstoftwo\@firstoftwo
+\bxwy@import\bxwy@gobbletwo\@gobbletwo
+\bxwy@import\bxwy@secondoftwo\@secondoftwo
+\bxwy@import@ex\bxwy@onlypreamble\ltx@gobble\@onlypreamble
 
 %--------------------------------------- general
 
@@ -70,6 +94,10 @@
 
 %% variables
 \newif\ifbxwy@ok
+
+%% \bxwy@cond\ifXXX...\fi{<true>}{<false>}
+\bxwy@gobbletwo\if\if \def\bxwy@cond#1\fi{%
+  #1\expandafter\bxwy@firstoftwo \else\expandafter\bxwy@secondoftwo \fi}
 
 %% \bxwy@engine : engine type
 %% \ifbxwy@eTeX@ok : have e-TeX extension?
@@ -128,7 +156,7 @@
 %% \bxwy@newcounter{<name>}
 %% \bxwy@setcounter{<name>}{<value>}
 % Declares a pseudo-counter (if not on e-TeX).
-\@onlypreamble\bxwy@newcounter
+\bxwy@onlypreamble\bxwy@newcounter
 \ifbxwy@eTeX@ok
   \let\bxwy@newcounter\newcounter
   \def\bxwy@setcounter#1#2{% assign locally
@@ -184,7 +212,7 @@
 
 %% \bxwy@add@jchar\CS{<combo-code>}
 % Adds a character with given combo-code to the macro \CS.
-\@onlypreamble\bxwy@add@jchar
+\bxwy@onlypreamble\bxwy@add@jchar
 \def\bxwy@add@jchar#1#2{%
   \begingroup
     \bxwy@freeze@fragile
@@ -192,9 +220,9 @@
     \edef\bxwy@tmpa{#2}%
     \expandafter\bxwy@add@jchar@dec\bxwy@tmpa::::\bxwy@end
   \endgroup}
-\@onlypreamble\bxwy@add@jchar@dec
-\@onlypreamble\bxwy@add@jchar@dec@a
-\@onlypreamble\bxwy@add@jchar@dec@b
+\bxwy@onlypreamble\bxwy@add@jchar@dec
+\bxwy@onlypreamble\bxwy@add@jchar@dec@a
+\bxwy@onlypreamble\bxwy@add@jchar@dec@b
 % engine-dependent parts
 \ifcase\bxwy@engine %8-bit
   \def\bxwy@add@jchar@dec#1:#2:#3:#4:#5\bxwy@end{%
@@ -248,11 +276,13 @@
 
 %%<*> \WarekiUseNormalInterGlue
 % Uses the normal definition of inter-ascii-kanji space.
+\bxwy@command
 \newcommand*\WarekiUseNormalInterGlue{%
   \let\bxwy@S\bxwy@normal@S
   \bxwy@render@all}
 %%<*> \WarekiUseNoInterGlue
 % Disables inter-ascii-kanji skip.
+\bxwy@command
 \newcommand*\WarekiUseNoInterGlue{%
   \let\bxwy@S\empty
   \bxwy@render@all}
@@ -272,6 +302,7 @@
 
 %%<+> \WarekiResetUHandler
 % Sets \bxwy@U to \bxwy@normal@U.
+\bxwy@command
 \newcommand*\WarekiResetUHandler{%
   \let\bxwy@U\bxwy@normal@U}
 %%<+> \WarekiSetUHandler{<text>}
@@ -320,10 +351,10 @@
 %--------------------------------------- kanji numerals
 
 %% \bxwy@set@jchar@digit{<n>}{<combo-code>}
-\@onlypreamble\bxwy@set@jchar@digit
+\bxwy@onlypreamble\bxwy@set@jchar@digit
 \def\bxwy@set@jchar@digit#1{%
   \expandafter\bxwy@set@jchar@digit@a\csname bxwy@jcd/#1\endcsname}
-\@onlypreamble\bxwy@set@jchar@digit@a
+\bxwy@onlypreamble\bxwy@set@jchar@digit@a
 \def\bxwy@set@jchar@digit@a#1#2{%
   \let#1\empty \bxwy@add@jchar#1{#2}}
 
@@ -554,11 +585,13 @@
 
 %%<*> \WarekiIfAvailable{<true>}{<false>}
 \ifnum\bxwy@engine=3
+  \bxwy@command
   \newcommand*\WarekiIfAvailable{%
     \ifx\bxwy@U\bxwy@normal@U \expandafter\@secondoftwo
     \else \expandafter\@firstoftwo
     \fi}
 \else
+  \bxwy@command
   \newcommand*\WarekiIfAvailable{%
     \@firstoftwo}
 \fi
@@ -566,25 +599,35 @@
 %%<*> counter 'warekiyear' : number of wareki year
 \bxwy@newcounter{warekiyear}
 %%<*> \warekigengo : kanji string of the current gengo
+\bxwy@command
 \newcommand*\warekigengo{}
 %%<*> \warekigengoinitial : initial Latin letter of the current gengo
+\bxwy@command
 \newcommand*\warekigengoinitial{}
 %%<*> \warekiyear : string of the wareki year
+\bxwy@command
 \newcommand*\warekiyear{}
 %%<*> \warekidate : string of the wareki date
+\bxwy@command
 \newcommand*\warekidate{}
 %%<*> \warekikanjidate : string of the wareki date (kansuji)
+\bxwy@command
 \newcommand*\warekikanjidate{}
 %%<*> \warekijkanjidate : string of the wareki date (kansuji-by-reading)
+\bxwy@command
 \newcommand*\warekijkanjidate{}
 %%<*> \warekitoday : \warekidate string of today
+\bxwy@command
 \newcommand*\warekitoday{}
 %%<*> \warekikanjitoday : \warekikanjidate string of today
+\bxwy@command
 \newcommand*\warekikanjitoday{}
 %%<*> \warekijkanjitoday : \warekijkanjidate string of today
+\bxwy@command
 \newcommand*\warekijkanjitoday{}
 
 %%<*> \warekisetdate{<year>}{<month>}{<day>}
+\bxwy@command
 \newcommand*\warekisetdate[3]{%
   \begingroup
     \bxwy@assign@date{#1}{#2}{#3}%
@@ -596,10 +639,12 @@
   \bxwy@render@date}
 
 %%<*> \warekisettoday
+\bxwy@command
 \newcommand*\warekisettoday{%
   \warekisetdate\year\month\day}
 
 %%<+> \WarekiSetToday
+\bxwy@command
 \newcommand*\WarekiSetToday{%
   \begingroup
     \bxwy@assign@date\year\month\day
@@ -611,12 +656,14 @@
   \bxwy@render@today}
 
 %%<+> WarekiIfCustomDateAvailable{<true>}{<false>}
+\bxwy@command
 \newcommand*\WarekiIfCustomDateAvailable{%
   \ifbxwy@customdate@ok \expandafter\@firstoftwo
   \else \expandafter\@secondoftwo
   \fi}
 
 %%<*> \warekicustomdate
+\bxwy@command
 \newcommand*\warekicustomdate[1]{%
   \warekidate}% fallback
 
