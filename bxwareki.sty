@@ -7,8 +7,51 @@
 %%
 %% This package is distributed under the MIT License.
 %%
-
+%
 % Note: This file is encoded entirely in us-ascii.
+%
+%% avoid multiple loading
+\csname\if11bxwarekiLoaded\fi\endcsname
+%% code guards
+\edef\bxjatoucsLoaded{%
+\catcode32=\the\catcode32%
+\catcode34=\the\catcode34%
+\catcode45=\the\catcode45%
+\catcode46=\the\catcode46%
+\catcode47=\the\catcode47%
+\catcode58=\the\catcode58%
+\catcode60=\the\catcode60%
+\catcode62=\the\catcode62%
+\catcode63=\the\catcode63%
+\catcode64=\the\catcode64%
+\catcode96=\the\catcode96%
+\catcode126=\the\catcode126%
+\relax}
+\catcode32=10\relax
+\catcode34=12 % <">
+\catcode45=12 % <->
+\catcode46=12 % <.>
+\catcode47=12 % </>
+\catcode58=12 % <:>
+\catcode60=12 % <<>
+\catcode62=12 % <>>
+\catcode63=12 % <?>
+\catcode64=11 % <?>
+\catcode96=12 % <`>
+\catcode126=13 % <~>
+\edef\bxwy@restore@codes{\bxwarekiLoaded
+  \noexpand\let\noexpand\bxwy@restore@codes\relax}
+\def\bxwarekiLoaded{\endinput}
+
+%% check for LaTeX
+\ifx\RequirePackage\bxwy@undefined %--------<*!LaTeX>
+  \let\bxwy@latex=f
+  \long\def\bxwy@next#1\ProvidesPackage#2[#3]{%
+    \immediate\write-1{Package: #2 #3}}
+  \expandafter\bxwy@next
+\else                              %--------<*LaTeX>
+  \let\bxwy@latex=t
+\fi                                %--------</LaTeX>
 
 %% package declaration
 \NeedsTeXFormat{LaTeX2e}
@@ -57,6 +100,7 @@
 %% switch 'bxwy@customdate@ok'
 % NB. It is "whether or not UTF-8 files can be safely loaded".
 \newif\ifbxwy@customdate@ok
+\ifx t\bxwy@latex   %--------<*LaTeX>
 \ifcase\bxwy@engine \bxwy@customdate@oktrue % 8-bit
 \or % pTeX
   \ifbxwy@epTeXinputencoding@ok \bxwy@customdate@oktrue
@@ -66,6 +110,7 @@
 \or % fallback
 \else \bxwy@customdate@oktrue
 \fi
+\fi                 %--------</LaTeX>
 
 %% \bxwy@oncex{...}
 % The once-expander, used in \edef.
@@ -100,6 +145,7 @@
 \fi
 
 %--------------------------------------- options
+\if t\bxwy@latex    %-------<*LaTeX>
 % Note: This package will never have ordinary options.
 % If it has options, they will be used only in special workflow.
 
@@ -108,6 +154,7 @@
 % dispatch
 \ProcessOptions\relax
 
+\fi                 %-------</LaTeX>
 %--------------------------------------- Japanese string maker
 
 % The "combo-code" represents a single Japanese character and has
@@ -591,5 +638,6 @@
 \let\warekijkanjitoday\warekijkanjidate
 
 %--------------------------------------- all done
+\bxwy@restore@codes
 \endinput
 %% EOF
