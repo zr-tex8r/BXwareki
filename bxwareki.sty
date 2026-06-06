@@ -140,6 +140,7 @@
   \edef\bxwy@tmpa{\string#1}\edef\bxwy@tmpb{\meaning#1}%
   \ifx\bxwy@tmpa\bxwy@tmpb #2\fi}
 \chardef\bxwy@engine=0 % 8-bit TeX
+\bxwy@next\Uchar         {\chardef\bxwy@engine=7 }% other Unicode
 \bxwy@next\kanjiskip     {\chardef\bxwy@engine=1 }% pTeX (or upTeX)
 \bxwy@next\jintercharskip{\chardef\bxwy@engine=2 }% NTT-jTeX
 \bxwy@next\Omegaversion  {\chardef\bxwy@engine=4 }% Omega
@@ -301,7 +302,7 @@
     \let\bxwy@org@tie=~\let~=\relax}
   \def\bxwy@restore@fragile{%
     \let~=\bxwy@org@tie \let\bxwy@U\bxwy@org@U}
-\else %Omega/XeTeX/LuaTeX
+\else %Omega/XeTeX/LuaTeX/Unicode
   \def\bxwy@add@jchar@dec#1:#2:#3:#4:#5\bxwy@end{%
     \lccode`\Z="#2\relax \lowercase{\bxwy@next{\noexpand Z}}}
 \fi
