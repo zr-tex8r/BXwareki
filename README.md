@@ -14,7 +14,7 @@ different notation of years.
 
 ### System requirement
 
-  * TeX format: LaTeX.
+  * TeX format: LaTeX and plain TeX.
   * TeX engine: pdfTeX, LuaTeX, XeTeX, pTeX, upTeX, ApTeX (pTeX-ng),
     and NTT-jTeX. (The e-TeX extension is not needed.)
 
@@ -36,6 +36,9 @@ See the manual `bxwareki.pdf` for detail.
 Revision History
 ----------------
 
+  * Version 0.8  ‹2026/06/06›
+      - Support for plain TeX.
+      - Add `\WarekiJxKansuji` and `\WarekiMonthName`.
   * Version 0.7  ‹2023/07/07›
       - Support for the fallback mode.
       - Add `\WarekiUseNoInterGlue`.

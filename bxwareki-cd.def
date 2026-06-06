@@ -1,7 +1,7 @@
 %%
 %% This is file 'bxwareki-cd.def'.
 %%
-%% Copyright (c) 2018-2023 Takayuki YATO (aka. "ZR")
+%% Copyright (c) 2018-2026 Takayuki YATO (aka. "ZR")
 %%   GitHub:   https://github.com/zr-tex8r
 %%   Twitter:  @zr_tex8r
 %%
@@ -12,7 +12,7 @@
 
 %% file declaration
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{bxwareki-cd.def}[2023/07/07 v0.7]
+\ProvidesFile{bxwareki-cd.def}[2026/06/06 v0.8]
 
 \ifbxwy@epTeXinputencoding@ok
   \epTeXinputencoding utf8

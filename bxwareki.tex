@@ -3,8 +3,8 @@
 \usepackage[scale=0.75]{geometry}
 \usepackage{shortvrb}
 \MakeShortVerb{\|}
-\newcommand{\PkgVersion}{0.7}
-\newcommand{\PkgDate}{2023/07/07}
+\newcommand{\PkgVersion}{0.8}
+\newcommand{\PkgDate}{2026/06/06}
 \newcommand{\Pkg}[1]{\textsf{#1}}
 \newcommand{\Meta}[1]{$\langle$\textit{#1}$\rangle$}
 \newcommand{\Note}{\par\noindent\emph{Note:}\quad}
@@ -12,7 +12,7 @@
 \newcommand{\Eg}{e.\,g.}
 \newcommand{\Means}{~:\quad}
 \usepackage{bxtexlogo}
-\bxtexlogoimport{*,ApTeX,JTeX}
+\bxtexlogoimport{*,ApTeX,JTeX,La}
 % Japanese something
 \usepackage{fontspec}
 \newfontfamily{\fIpaex}{IPAexMincho}[Scale=0.95]
@@ -48,7 +48,7 @@ which corresponds to the Japanese term \emph{seireki} (\Ja{西暦}).
 \paragraph{System requirement}
 
 \begin{itemize}
-\item \TeX{} format: \LaTeX.
+\item \TeX{} format: \LaTeX, plain {\TeX}.
 \item \TeX{} engine: {\pdfTeX}, {\LuaTeX}, {\XeTeX},
   {\pTeX}, {\upTeX}, {\ApTeX} ({\pTeX}-ng), NTT-{\JTeX}.
 \end{itemize}
@@ -104,9 +104,12 @@ No options are available.
 \item Counter |warekiyear|\Means
   The year number (within the gengo); \Eg~``\Ja{4}''.
 
+  \Note Counters are available only on {\LaTeX}.
+  On plain {\TeX}, you can use the command |\thewarekiyear|
+  (which expands to numerals) instead.
   \Note Unlike ordinary counters,
   the assignment to |warekiyear| by |\warekisetdate| is \emph{local}.
-  Moreover, manual assignment to this counter is not supported.
+  Moreover, manual assignment to this counter is \emph{not} supported.
 
 \item |\warekigengo|\Means
   The gengo (\Ja{元号}) in kanji, \Eg~``\Ja{令和}''.
@@ -162,11 +165,10 @@ No options are available.
 
   \Note This command is supported only on {\pdfLaTeX}, {\XeLaTeX},
   {\LuaLaTeX}, {\upLaTeX}, {Ap\LaTeX} and recent versions of {\pLaTeX}.
-  On other engines it simply falls back to |\warekidate|.
-
-\item |\WarekiIfCustomDateAvailable{|\Meta{true}|}{|\Meta{false}|}|\Means
-  Tests if the command |\warekicustomdate| is
-  supported on the engine in use.
+  On other engines (and plain {\TeX} format)
+  the command simply falls back to |\warekidate|.
+  Users can use |\WarekiIfCustomDateAvailable| to know
+  whether the command really works.
 \end{itemize}
 
 %-------------------
@@ -196,18 +198,19 @@ suitable for the most prevalent Japanese-typesetting environment
 for the engine in use.
 
 \begin{itemize}
-\item On {\pLaTeX}, {\upLaTeX} and {Ap\LaTeX}:
+\item On p(\La){\TeX}, up(\La){\TeX} and Ap(\La){\TeX}:
   Nothing is inserted,
   since the engine can automatically insert shibuaki spaces.
-\item On {\LuaLaTeX} and {\XeLaTeX}:
+\item On Lua(\La){\TeX} and \bxtexlogo{Xe}(\La){\TeX}:
   Nothing is inserted,
   on the assumption that the package for Japanese typesetting
   (such as \Pkg{\LuaTeX-ja} and \Pkg{xeCJK})
   will automatically insert shibuaki spaces.
-\item On {\LaTeX} and {\pdfLaTeX}:
+\item On (\La){\TeX} and pdf(\La){\TeX}:
   A tie (|~|) is inserted,
-  on the assumption that the \Pkg{CJK} package is employed
-  and |\CJKtilde| is in effect.
+  on the assumption that the \Pkg{CJK} package
+  (or its alternative)
+  is employed and |\CJKtilde| is in effect.
 \end{itemize}
 
 The command for shibuaki can be changed with the following commands:
@@ -225,9 +228,9 @@ The command for shibuaki can be changed with the following commands:
 %-------------------
 \subsection{Counter output commands}
 
-The following commands are intended
-to use with |warekiyear| counter,
-but they can probably be used
+\Note Only available on {\LaTeX}.
+
+The following commands can be used
 as general-use counter output commands
 (like |\arabic|):
 \begin{itemize}
@@ -236,6 +239,30 @@ as general-use counter output commands
 \item |\WarekiJKansuji{|\Meta{counter}|}|\Means
   Prints the counter value using kansuji-by-reading.
   Only valid for numbers less than 1000.
+\end{itemize}
+
+On engines that support |\warekicustomdate|,
+you can use the following commands:
+\begin{itemize}
+\item |\WarekiJxKansuji{|\Meta{counter}|}|\Means
+  Prints the counter value using kansuji-by-reading
+  with ``ten's multiple'' kanji characters
+  (as with |J| options of |\warekicustomdate|).
+  Only valid for numbers less than 100.
+\item |\WarekiMonthName{|\Meta{counter}|}|\Means
+  Prints the \emph{imyo} name of the month.
+  Only valid for numbers in range from 1 to 12.
+\end{itemize}
+
+%-------------------
+\subsection{Checks for availability}
+
+\begin{itemize}
+\item |\WarekiIfAvailable{|\Meta{true}|}{|\Meta{false}|}|\Means
+  Tests if the package can really write kanji characters.
+\item |\WarekiIfCustomDateAvailable{|\Meta{true}|}{|\Meta{false}|}|\Means
+  Tests if the command |\warekicustomdate| is
+  supported on the engine in use.
 \end{itemize}
 
 %===========================================================
