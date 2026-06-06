@@ -53,6 +53,14 @@
   \fi
   \ifnum#2>\z@ \csname bxwy@jcd/#2\endcsname \fi}
 
+%%<*> \WarekiJxKansuji{<counter>}
+\@ifdefinable\@WarekiJxKansuji{%
+\newcommand*\WarekiJxKansuji[1]{%
+  \expandafter\@WarekiJxKansuji\csname c@#1\endcsname}
+\def\@WarekiJxKansuji{%
+  \bxwy@counter@fun\bxwy@Jkansuji}
+}
+
 %--------------------------------------- custom date format
 
 %% \warekicustomdate{<options>}
@@ -122,6 +130,14 @@
 \def\bxwy@cdpo@@J#1#2#3{#1J#3}
 \def\bxwy@cdpo@@o#1#2#3{#1#2o}
 \def\bxwy@cdpo@@O#1#2#3{#1#2O}
+
+%%<*> \WarekiMonthName{<counter>}
+\@ifdefinable\@WarekiMonthName{%
+\newcommand*\WarekiMonthName[1]{%
+  \expandafter\@WarekiMonthName\csname c@#1\endcsname}
+\def\@WarekiMonthName#1{%
+  \bxwy@custom@date@month o#1}
+}
 
 %--------------------------------------- all done
 \endinput
