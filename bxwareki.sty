@@ -75,14 +75,48 @@
 %% packages
 \input ltxcmds.sty
 \input infwarerr.sty
+%% variables
+\newcount\bxwy@cnta
+\newcount\bxwy@cntb
+%% \bxwy@import/\bxwy@import@ex
+\def\bxwy@import#1{%
+  \expandafter\bxwy@import@a\string#1\relax#1}
+\def\bxwy@next#1.{\def\bxwy@import@a##1#1}%
+\expandafter\bxwy@next\string @.#2\relax#3{%
+  \expandafter\bxwy@import@ex\expandafter#3\csname ltx@#2\endcsname}
+\def\bxwy@import@ex#1#2#3{\ifx#1\bxwy@undefined \let#1=#2\fi}
+%% \bxwy@ifdefinable
+\def\bxwy@ifdefinable#1{%
+  \bxwy@cond{%
+      \if\ifx#1\bxwy@undefined F\else\ifx#1\relax F\else T\fi\fi T}\fi{%
+    \@PackageError\bxwy@pkgname
+     {Command \noexpand#1 already defined}{\@ehd}}}
+%% \bxwy@command\newcommand*\CS...
+\def\bxwy@command\newcommand*#1{%
+  \def\bxwy@tmpa{#1}%
+  \futurelet\bxwy@tok\bxwy@command@a}
+\def\bxwy@command@a{%
+  \bxwy@cond\ifx[\bxwy@tok\fi\bxwy@command@b{\bxwy@command@b[0]}}
+\def\bxwy@command@b{\expandafter\bxwy@command@c\bxwy@tmpa}
+\def\bxwy@command@c#1[#2]{%
+  \bxwy@cond\ifnum#2=3 \fi{\def#1##1##2##3}{%
+  \bxwy@cond\ifnum#2=2 \fi{\def#1##1##2}{%
+  \bxwy@cond\ifnum#2=1 \fi{\def#1##1}{\def#1}}}}
+%% \bxwy@two@digits
+\def\bxwy@two@digits#1{%
+  \ifnum #1<10 0\fi \number #1}
 
 \fi                 %--------</LaTeX>
 
 %% imports
+\bxwy@import\bxwy@cnta\@tempcnta
+\bxwy@import\bxwy@cntb\@tempcntb
 \bxwy@import\bxwy@command\relax
 \bxwy@import\bxwy@firstoftwo\@firstoftwo
 \bxwy@import\bxwy@gobbletwo\@gobbletwo
+\bxwy@import\bxwy@ifdefinable\@ifdefinable
 \bxwy@import\bxwy@secondoftwo\@secondoftwo
+\bxwy@import\bxwy@two@digits\two@digits
 \bxwy@import@ex\bxwy@onlypreamble\ltx@gobble\@onlypreamble
 
 %--------------------------------------- general
@@ -157,14 +191,14 @@
 %% \bxwy@setcounter{<name>}{<value>}
 % Declares a pseudo-counter (if not on e-TeX).
 \bxwy@onlypreamble\bxwy@newcounter
-\ifbxwy@eTeX@ok
+\if\ifx t\bxwy@latex\ifbxwy@eTeX@ok T\else F\fi\else F\fi T%
   \let\bxwy@newcounter\newcounter
   \def\bxwy@setcounter#1#2{% assign locally
     \csname c@#1\endcsname#2\relax}
 \else
   \def\bxwy@newcounter#1{%
-    \expandafter\@ifdefinable\csname the#1\endcsname{%
-    \expandafter\@ifdefinable\csname c@#1\endcsname{%
+    \expandafter\bxwy@ifdefinable\csname the#1\endcsname{%
+    \expandafter\bxwy@ifdefinable\csname c@#1\endcsname{%
       \expandafter\mathchardef\csname c@#1\endcsname\z@
       \expandafter\gdef\csname the#1\expandafter\endcsname\expandafter{%
         \expandafter\number\csname c@#1\endcsname}}}}
@@ -289,7 +323,7 @@
 \ifbxwy@eTeX@ok       %<*eTeX>
 %%<*> \WarekiUseCustomInterGlue{<text>}
 % Uses the custom definition of inter-ascii-kanji space.
-\@ifdefinable\WarekiUseCustomInterGlue{%
+\bxwy@ifdefinable\WarekiUseCustomInterGlue{%
   \def\WarekiUseCustomInterGlue#{%
     \afterassignment\bxwy@render@all
     \protected\def\bxwy@S}}
@@ -307,7 +341,7 @@
   \let\bxwy@U\bxwy@normal@U}
 %%<+> \WarekiSetUHandler{<text>}
 % Redefines \bxwy@U. In <text> #1 means the codepoint in hex.
-\@ifdefinable\WarekiSetUHandler{%
+\bxwy@ifdefinable\WarekiSetUHandler{%
   \def\WarekiSetUHandler#{%
     \def\bxwy@U##1}}
 % set default
@@ -372,13 +406,8 @@
 \bxwy@set@jchar@digit{X}{E58D81:5341:3D3D:eE2}% ten
 \bxwy@set@jchar@digit{C}{E799BE:767E:4934:j41}% hundred
 
-%%<*> \WarekiKansuji{<counter>}
 %% \bxwy@kansuji{<number>}
 % The kansuji representation of the number.
-\newcommand*\WarekiKansuji[1]{%
-  \expandafter\@WarekiKansuji\csname c@#1\endcsname}
-\newcommand*\@WarekiKansuji{%
-  \bxwy@counter@fun\bxwy@kansuji}
 \def\bxwy@kansuji#1{%
   \ifnum#1<\z@\else
     \expandafter\bxwy@kansuji@a\number#1\bxwy@mk
@@ -389,14 +418,9 @@
     \expandafter\bxwy@kansuji@a
   \fi}
 
-%%<*> \WarekiJKansuji{<counter>}
 %% \bxwy@jkansuji{<number>}
 % The kansuji-by-reading representation of the number.
 % NB. Only valid in range 0..999; otherwise fallback to \bxwy@kansuji.
-\newcommand*\WarekiJKansuji[1]{%
-  \expandafter\@WarekiJKansuji\csname c@#1\endcsname}
-\newcommand*\@WarekiJKansuji{%
-  \bxwy@counter@fun\bxwy@jkansuji}
 \def\bxwy@jkansuji#1{%
   \expandafter\bxwy@jkansuji@a\number#1\bxwy@mk}
 \chardef\bxwy@jk@x=10
@@ -420,6 +444,25 @@
   \ifnum#2>\z@  \bxwy@twicex{\csname bxwy@jcd/X\endcsname}\fi
   \ifnum#3>\z@  \bxwy@twicex{\csname bxwy@jcd/#3\endcsname}\fi}
 
+%--------------------------------------- counter output
+\if t\bxwy@latex    %--------<*LaTeX>
+
+%%<*> \WarekiKansuji{<counter>}
+\@ifdefinable\@WarekiKansuji{%
+\newcommand*\WarekiKansuji[1]{%
+  \expandafter\@WarekiKansuji\csname c@#1\endcsname}
+\def\@WarekiKansuji{%
+  \bxwy@counter@fun\bxwy@kansuji}
+}
+
+%%<*> \WarekiJKansuji{<counter>}
+\@ifdefinable\@WarekiJKansuji{%
+\newcommand*\WarekiJKansuji[1]{%
+  \expandafter\@WarekiJKansuji\csname c@#1\endcsname}
+\def\@WarekiJKansuji{%
+  \bxwy@counter@fun\bxwy@jkansuji}
+}
+
 %% \bxwy@counter@fun
 \let\bxwy@tmpa=f
 \ifcase\bxwy@engine \or
@@ -432,6 +475,7 @@
 \else \let\bxwy@counter@fun\empty
 \fi
 
+\fi                 %--------</LaTeX>
 %--------------------------------------- calculate wareki year
 
 %% errors
@@ -453,46 +497,46 @@
   \bxwy@assign@date@a\month{#2}{1}{99}{}%
   \bxwy@assign@date@a\day  {#3}{1}{99}{}}
 \def\bxwy@assign@date@a#1#2#3#4#5{%
-  \afterassignment\bxwy@assign@date@b\@tempcnta=#2\bxwy@mk{#2}%
+  \afterassignment\bxwy@assign@date@b\bxwy@cnta=#2\bxwy@mk{#2}%
   \bxwy@oktrue
-  \edef\bxwy@tmpb{\the\@tempcnta}%
-  \ifnum#3>\@tempcnta \bxwy@okfalse \@tempcnta#3\relax \fi
-  \ifnum#4<\@tempcnta \bxwy@okfalse \@tempcnta#4\relax \fi
+  \edef\bxwy@tmpb{\the\bxwy@cnta}%
+  \ifnum#3>\bxwy@cnta \bxwy@okfalse \bxwy@cnta#3\relax \fi
+  \ifnum#4<\bxwy@cnta \bxwy@okfalse \bxwy@cnta#4\relax \fi
   \ifbxwy@ok\else \ifx\bxwy@mt#5\bxwy@mt\else
     \bxwy@err@ivrng\bxwy@tmpb{#3}{#4}{#5}%
   \fi\fi
-  #1=\ifnum\@tempcnta=\z@ \@ne \else \@tempcnta \fi}
+  #1=\ifnum\bxwy@cnta=\z@ \@ne \else \bxwy@cnta \fi}
 \def\bxwy@assign@date@b#1\bxwy@mk#2{%
   \ifx\bxwy@mk#1\bxwy@mk\else
-    \@tempcnta\z@
+    \bxwy@cnta\z@
     \bxwy@err@ivnum{#2}%
   \fi}
 
 %% \bxwy@calc@wareki@year
 % Sets \bxwy@g@gengo and \bxwy@g@year.
 \def\bxwy@calc@wareki@year{%
-  \@tempcnta=\the\year\two@digits\month\two@digits\day\relax
-  \let\bxwy@tmpa\empty \let\bxwy@tmpb\empty \@tempcntb\year
-  \ifnum\@tempcnta<18730101 % ancient times (non-Gregorian)
-  \else\ifnum\@tempcnta<19120730 % meiji era
+  \bxwy@cnta=\the\year\bxwy@two@digits\month\bxwy@two@digits\day\relax
+  \let\bxwy@tmpa\empty \let\bxwy@tmpb\empty \bxwy@cntb\year
+  \ifnum\bxwy@cnta<18730101 % ancient times (non-Gregorian)
+  \else\ifnum\bxwy@cnta<19120730 % meiji era
     \let\bxwy@tmpb\bxwy@@meiji
-    \advance\@tempcntb-1867\relax
-  \else\ifnum\@tempcnta<19261225 % taisho era
+    \advance\bxwy@cntb-1867\relax
+  \else\ifnum\bxwy@cnta<19261225 % taisho era
     \let\bxwy@tmpb\bxwy@@taisho
-    \advance\@tempcntb-1911\relax
-  \else\ifnum\@tempcnta<19890108 % showa era
+    \advance\bxwy@cntb-1911\relax
+  \else\ifnum\bxwy@cnta<19890108 % showa era
     \let\bxwy@tmpb\bxwy@@showa
-    \advance\@tempcntb-1925\relax
-  \else\ifnum\@tempcnta<20190501 % heisei era
+    \advance\bxwy@cntb-1925\relax
+  \else\ifnum\bxwy@cnta<20190501 % heisei era
     \let\bxwy@tmpb\bxwy@@heisei
-    \advance\@tempcntb-1988\relax
+    \advance\bxwy@cntb-1988\relax
   \else % the new era
     \let\bxwy@tmpb\bxwy@@reiwa
-    \advance\@tempcntb-2018\relax
+    \advance\bxwy@cntb-2018\relax
   \fi\fi\fi\fi\fi
   %
   \global\let\bxwy@g@gengo\bxwy@tmpb
-  \xdef\bxwy@g@year{\the\@tempcntb}%
+  \xdef\bxwy@g@year{\the\bxwy@cntb}%
   \xdef\bxwy@g@date{{\the\year}{\the\month}{\the\day}}}
 
 %% \bxwy@gengo@initial@of\CS
@@ -587,13 +631,11 @@
 \ifnum\bxwy@engine=3
   \bxwy@command
   \newcommand*\WarekiIfAvailable{%
-    \ifx\bxwy@U\bxwy@normal@U \expandafter\@secondoftwo
-    \else \expandafter\@firstoftwo
-    \fi}
+    \bxwy@cond\ifx\bxwy@U\bxwy@normal@U\fi}
 \else
   \bxwy@command
   \newcommand*\WarekiIfAvailable{%
-    \@firstoftwo}
+    \bxwy@firstoftwo}
 \fi
 
 %%<*> counter 'warekiyear' : number of wareki year
@@ -658,9 +700,7 @@
 %%<+> WarekiIfCustomDateAvailable{<true>}{<false>}
 \bxwy@command
 \newcommand*\WarekiIfCustomDateAvailable{%
-  \ifbxwy@customdate@ok \expandafter\@firstoftwo
-  \else \expandafter\@secondoftwo
-  \fi}
+  \bxwy@cond\ifbxwy@customdate@ok\fi}
 
 %%<*> \warekicustomdate
 \bxwy@command
