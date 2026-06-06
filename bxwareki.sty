@@ -25,6 +25,9 @@
 \def\bxwy@mt{\noexpand\bxwy@mt@}
 \let\bxwy@mk\indent
 
+%% variables
+\newif\ifbxwy@ok
+
 %% \bxwy@engine : engine type
 %% \ifbxwy@eTeX@ok : have e-TeX extension?
 %% \ifbxwy@epTeXinputencoding@ok : have \epTeXinputencoding?
@@ -43,7 +46,7 @@
 \ifbxwy@eTeX@ok\else \ifnum\bxwy@engine=0
   \chardef\bxwy@engine=3 % fallback
 \fi\fi
-\ifx\WarekiForceFallback\@undefined\else
+\ifx\WarekiForceFallback\bxwy@undefined\else
   \chardef\bxwy@engine=3
 \fi
 \newif\ifbxwy@upTeX@ok
@@ -87,10 +90,11 @@
     \csname c@#1\endcsname#2\relax}
 \else
   \def\bxwy@newcounter#1{%
+    \expandafter\@ifdefinable\csname the#1\endcsname{%
     \expandafter\@ifdefinable\csname c@#1\endcsname{%
       \expandafter\mathchardef\csname c@#1\endcsname\z@
       \expandafter\gdef\csname the#1\expandafter\endcsname\expandafter{%
-        \expandafter\@arabic\csname c@#1\endcsname}}}
+        \expandafter\number\csname c@#1\endcsname}}}}
   \def\bxwy@setcounter#1#2{% assign locally
     \expandafter\mathchardef\csname c@#1\endcsname#2\relax}
 \fi
@@ -116,7 +120,7 @@
 % - f3F is something for jTeX.
 
 %% \bxwy@S : inter-ascii-kanji skip
-\let\bxwy@S\@empty
+\let\bxwy@S\empty
 %% \bxwy@normal@S : the normal definition of \bxwy@S
 \let\bxwy@normal@S\relax
 %% \bxwy@C : Japanese character printer for JTeX
@@ -203,7 +207,7 @@
 %%<*> \WarekiUseNoInterGlue
 % Disables inter-ascii-kanji skip.
 \newcommand*\WarekiUseNoInterGlue{%
-  \let\bxwy@S\@empty
+  \let\bxwy@S\empty
   \bxwy@render@all}
 \ifbxwy@eTeX@ok       %<*eTeX>
 %%<*> \WarekiUseCustomInterGlue{<text>}
@@ -234,36 +238,36 @@
 %--------------------------------------- Japanese words
 
 %% \bxwy@@meiji : kanji string 'Meiji'
-\let\bxwy@@meiji\@empty
+\let\bxwy@@meiji\empty
 \bxwy@add@jchar\bxwy@@meiji{E6988E:660E:4C40:k67}
 \bxwy@add@jchar\bxwy@@meiji{E6B2BB:6CBB:3C23:e6A}
 %% \bxwy@@taisho : kanji string 'Taisho'
-\let\bxwy@@taisho\@empty
+\let\bxwy@@taisho\empty
 \bxwy@add@jchar\bxwy@@taisho{E5A4A7:5927:4267:gE2}
 \bxwy@add@jchar\bxwy@@taisho{E6ADA3:6B63:4035:fF4}
 %% \bxwy@@showa : kanji string 'Showa'
-\let\bxwy@@showa\@empty
+\let\bxwy@@showa\empty
 \bxwy@add@jchar\bxwy@@showa{E698AD:662D:3E3C:f3F}
 \bxwy@add@jchar\bxwy@@showa{E5928C:548C:4F42:l83}
 %% \bxwy@@heisei : kanji string 'Heisei'
-\let\bxwy@@heisei\@empty
+\let\bxwy@@heisei\empty
 \bxwy@add@jchar\bxwy@@heisei{E5B9B3:5E73:4A3F:jAA}
 \bxwy@add@jchar\bxwy@@heisei{E68890:6210:402E:fED}
 %% \bxwy@@reiwa : kanji string 'Reiwa'
-\let\bxwy@@reiwa\@empty
+\let\bxwy@@reiwa\empty
 \bxwy@add@jchar\bxwy@@reiwa{E4BBA4:4EE4:4E61:l44}
 \bxwy@add@jchar\bxwy@@reiwa{E5928C:548C:4F42:l83}
 %% \bxwy@@nen : kanji for 'year'
-\let\bxwy@@nen\@empty
+\let\bxwy@@nen\empty
 \bxwy@add@jchar\bxwy@@nen{E5B9B4:5E74:472F:i80}
 %% \bxwy@@gatsu : kanji for 'month'
-\let\bxwy@@gatsu\@empty
+\let\bxwy@@gatsu\empty
 \bxwy@add@jchar\bxwy@@gatsu{E69C88:6708:376E:cDF}
 %% \bxwy@@nichi : kanji for 'day'
-\let\bxwy@@nichi\@empty
+\let\bxwy@@nichi\empty
 \bxwy@add@jchar\bxwy@@nichi{E697A5:65E5:467C:i6F}
 %% \bxwy@@gan : kanji for 'origin'
-\let\bxwy@@gan\@empty
+\let\bxwy@@gan\empty
 \bxwy@add@jchar\bxwy@@gan{E58583:5143:3835:d04}
 
 %--------------------------------------- kanji numerals
@@ -274,7 +278,7 @@
   \expandafter\bxwy@set@jchar@digit@a\csname bxwy@jcd/#1\endcsname}
 \@onlypreamble\bxwy@set@jchar@digit@a
 \def\bxwy@set@jchar@digit@a#1#2{%
-  \let#1\@empty \bxwy@add@jchar#1{#2}}
+  \let#1\empty \bxwy@add@jchar#1{#2}}
 
 %% \[bxwr@jcd/<n>] : kanji digit for n
 \bxwy@set@jchar@digit{0}{E38087:3007:213B:{sy}1B}
@@ -347,7 +351,7 @@
 \ifx t\bxwy@tmpa
   \def\bxwy@counter@fun#1#2{%
     \expandafter\protect\expandafter#1\expandafter{\number#2}}
-\else \let\bxwy@counter@fun\@empty
+\else \let\bxwy@counter@fun\empty
 \fi
 
 %--------------------------------------- calculate wareki year
@@ -372,11 +376,11 @@
   \bxwy@assign@date@a\day  {#3}{1}{99}{}}
 \def\bxwy@assign@date@a#1#2#3#4#5{%
   \afterassignment\bxwy@assign@date@b\@tempcnta=#2\bxwy@mk{#2}%
-  \@tempswatrue
+  \bxwy@oktrue
   \edef\bxwy@tmpb{\the\@tempcnta}%
-  \ifnum#3>\@tempcnta \@tempswafalse \@tempcnta#3\relax \fi
-  \ifnum#4<\@tempcnta \@tempswafalse \@tempcnta#4\relax \fi
-  \if@tempswa\else \ifx\bxwy@mt#5\bxwy@mt\else
+  \ifnum#3>\@tempcnta \bxwy@okfalse \@tempcnta#3\relax \fi
+  \ifnum#4<\@tempcnta \bxwy@okfalse \@tempcnta#4\relax \fi
+  \ifbxwy@ok\else \ifx\bxwy@mt#5\bxwy@mt\else
     \bxwy@err@ivrng\bxwy@tmpb{#3}{#4}{#5}%
   \fi\fi
   #1=\ifnum\@tempcnta=\z@ \@ne \else \@tempcnta \fi}
@@ -390,7 +394,7 @@
 % Sets \bxwy@g@gengo and \bxwy@g@year.
 \def\bxwy@calc@wareki@year{%
   \@tempcnta=\the\year\two@digits\month\two@digits\day\relax
-  \let\bxwy@tmpa\@empty \let\bxwy@tmpb\@empty \@tempcntb\year
+  \let\bxwy@tmpa\empty \let\bxwy@tmpb\empty \@tempcntb\year
   \ifnum\@tempcnta<18730101 % ancient times (non-Gregorian)
   \else\ifnum\@tempcnta<19120730 % meiji era
     \let\bxwy@tmpb\bxwy@@meiji
@@ -415,7 +419,7 @@
 
 %% \bxwy@gengo@initial@of\CS
 \def\bxwy@gengo@initial@of#1{%
-  \ifx#1\@empty \@empty
+  \ifx#1\empty \empty
   \else\ifx#1\bxwy@@meiji  M%
   \else\ifx#1\bxwy@@taisho T%
   \else\ifx#1\bxwy@@showa  S%
@@ -434,7 +438,7 @@
   \bxwy@freeze@fragile
   % \CSOyear
   \edef#6{%
-    \ifx#4\@empty \number#1%(y)
+    \ifx#4\empty \number#1%(y)
     \else
       \bxwy@oncex{#4}%(\CSIgengo)
       \ifnum#5=\@ne \bxwy@oncex{\bxwy@@gan}%
@@ -444,7 +448,7 @@
   % \CSOdate
   \edef#7{%
     \bxwy@oncex{#6}%(\CSOyear)
-    \ifx#4\@empty \bxwy@S
+    \ifx#4\empty \bxwy@S
     \else\ifnum#5=\@ne %nix
     \else \bxwy@S
     \fi\fi
@@ -453,7 +457,7 @@
     \bxwy@S#3\bxwy@S \bxwy@oncex{\bxwy@@nichi}}%(d)
   % \CSOkanjidate
   \edef#8{%
-    \ifx#4\@empty \bxwy@kansuji{#1}%(y)
+    \ifx#4\empty \bxwy@kansuji{#1}%(y)
     \else
       \bxwy@oncex{#4}%(\CSIgengo)
       \ifnum#5=\@ne \bxwy@oncex{\bxwy@@gan}%
@@ -465,7 +469,7 @@
     \bxwy@kansuji{#3}\bxwy@oncex{\bxwy@@nichi}}%(d)
   % \CSOjkanjidate
   \edef#9{%
-    \ifx#4\@empty \bxwy@jkansuji{#1}%(y)
+    \ifx#4\empty \bxwy@jkansuji{#1}%(y)
     \else
       \bxwy@oncex{#4}%(\CSIgengo)
       \ifnum#5=\@ne \bxwy@oncex{\bxwy@@gan}%
